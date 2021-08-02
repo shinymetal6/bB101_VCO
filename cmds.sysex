@@ -1,0 +1,194 @@
+system_param_cmd     = 0x20
+system_command_cmd   = 0x30
+oscillator_param_cmd = 0x4x
+filter_param_cmd     = 0x5x
+delay_param_cmd      = 0x6x
+
+a_level d_level s_level_r_level a_value d_value are 0..7f, shifted << 5 and saturated
+waveform is 0 = sine , 1 = triangle , 2 = square
+
+oscillator adsr example
+amidi -p hw:2,0,0 -S 'F0 40 14 28 14 3c  F7'
+						  |  |  |  |  | 
+						  |  |  |  |  | 
+						  |  |  |  |  ---------------------------	Sval
+						  |  |  |  ------------------------------	Rtime
+						  |  |  ---------------------------------	Dtime
+						  |  ------------------------------------	Atime
+						  ---------------------------------------	oscillator param cmd
+
+
+oscillator detune example , 005.0 Hz 
+amidi -p hw:2,0,0 -S 'F0 41 00 30 30 35 30 F7'
+						  |  |  |  |  |  |  
+						  |  |  |  |  |  ------------------------   Decimal
+						  |  |  |  |  ---------------------------   Unit
+						  |  |  |  ------------------------------   Tenth
+						  |  |  ---------------------------------	Hundred
+						  |  ------------------------------------	oscillator number
+						  ---------------------------------------	oscillator detune cmd
+
+oscillator waveform example
+#define	SINE							0
+#define	TRIANGLE						1
+#define	SQUARE							2
+amidi -p hw:2,0,0 -S 'F0 42 00 00 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	SINE
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+amidi -p hw:2,0,0 -S 'F0 42 00 01 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	TRIANGLE
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+amidi -p hw:2,0,0 -S 'F0 42 00 02 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	SQUARE
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+
+oscillator ALL waveform example
+#define	SINE							0
+#define	TRIANGLE						1
+#define	SQUARE							2
+amidi -p hw:2,0,0 -S 'F0 4A 00 00 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	SINE
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator ALL waveform cmd
+amidi -p hw:2,0,0 -S 'F0 4A 00 01 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	TRIANGLE
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator ALL waveform cmd
+amidi -p hw:2,0,0 -S 'F0 4A 00 02 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	SQUARE
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator ALL waveform cmd
+
+oscillator duty example , duty is 5% step ( 1 is 5% , 2 is 10% 5 is 25% and so on )
+amidi -p hw:2,0,0 -S 'F0 43 00 13 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	duty 90% ( max value 99 , 0x63 )
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 43 00 0A F7'
+						  |  |  |
+						  |  |  |  ------------------------------	duty 50% ( max value 99 , 0x63 )
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 43 00 01 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	duty 5% ( max value 99 , 0x63 )
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+						  
+oscillator ALL duty example , duty is 5% step ( 1 is 5% , 2 is 10% 5 is 25% and so on )
+amidi -p hw:2,0,0 -S 'F0 4B 00 5F F7'
+						  |  |  |
+						  |  |  |  ------------------------------	duty 90% ( max value 99 , 0x63 )
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 4B 00 32 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	duty 50% ( max value 99 , 0x63 )
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 4B 00 05 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	duty 5% ( max value 99 , 0x63 )
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator waveform cmd
+
+oscillator volume example
+amidi -p hw:2,0,0 -S 'F0 44 00 13 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	volume 100% ( max value 100 , 0x64 )
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 44 00 0A F7'
+						  |  |  |
+						  |  |  |  ------------------------------	volume 50% ( max value 99 , 0x32 )
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 44 00 01 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	volume 0% ( max value 99 , 0x00 )
+						  |  ------------------------------------	oscillator offset
+						  ---------------------------------------	oscillator waveform cmd
+						  
+oscillator ALL volume example
+amidi -p hw:2,0,0 -S 'F0 4C 00 13 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	volume 100% ( max value 100 , 0x64 )
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 4C 00 0A F7'
+						  |  |  |
+						  |  |  |  ------------------------------	volume 50% ( max value 99 , 0x32 )
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator waveform cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 4C 00 01 F7'
+						  |  |  |
+						  |  |  |  ------------------------------	volume 0% ( max value 99 , 0x00 )
+						  |  ------------------------------------	oscillator offset ( not used )
+						  ---------------------------------------	oscillator waveform cmd
+						  
+						  
+						  
+filter param example set cutoff and resonance
+amidi -p hw:2,0,0 -S 'F0 50 31 32 33 34 35 30 20 F7'
+						  |  |  |  |  |  |  |  | 
+						  |  |  |  |  |  |  |  |
+						  |  |  |  |  |  |  |  ------------------	filter type ( 0x10 = bp , 0x20 = lp , 0x40 = hp )
+						  |  |  |  |  |  |  ---------------------	resonance x1
+						  |  |  |  |  |  ------------------------	resonance x10
+						  |  |  |  |  ---------------------------	cutoff x1
+						  |  |  |  ------------------------------	cutoff x10
+						  |  |  ---------------------------------	cutoff x100
+						  |  ------------------------------------	cutoff x1000
+						  ---------------------------------------	filter param cmd
+
+delay param example
+amidi -p hw:2,0,0 -S 'F0 60 35 30 30 F7'
+						  |  |  |  |  
+						  |  |  |  |  
+						  |  |  |  ------------------------------	delay x1
+						  |  |  ---------------------------------	delay x10
+						  |  ------------------------------------	delay x100
+						  ---------------------------------------	delay param cmd
+
+
+amidi -p hw:2,0 -S "90 3C 7F"
+amidi -p hw:2,0 -S "80 3C 7F"
+
+
+/* SYSTEM */
+system command example
+amidi -p hw:2,0,0 -S 'F0 30 55  F7'
+						  |  | 
+						  |  ------------------------------------	reset oscillators
+						  ---------------------------------------	system command cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 30 11  F7'
+						  |  | 
+						  |  ------------------------------------	dump system flags
+						  ---------------------------------------	system command cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 30 22 00 F7' -r dump.syx -t 1
+						  |  |  |  
+						  |  |  ---------------------------------	program number
+						  |  ------------------------------------	dump program
+						  ---------------------------------------	system command cmd
+						  
+						  

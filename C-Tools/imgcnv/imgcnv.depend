@@ -1,0 +1,33 @@
+# depslib dependency file v1.0
+1626783646 source:/Devel/Stm32Sw/bB100_Swarm/C-Tools/imgcnv/Src/bmp_convert.c
+	<stdio.h>
+	<string.h>
+	<fcntl.h>
+	<errno.h>
+	<termios.h>
+	<unistd.h>
+
+1626785631 source:/Devel/Stm32Sw/bB100_Swarm/C-Tools/imgcnv/Src/main.c
+	<stdio.h>
+	<string.h>
+	<fcntl.h>
+	<errno.h>
+	<termios.h>
+	<unistd.h>
+
+1627897153 source:/Devel/Stm32Sw/bB101_VCO/C-Tools/imgcnv/Src/bmp_convert.c
+	<stdio.h>
+	<string.h>
+	<fcntl.h>
+	<errno.h>
+	<termios.h>
+	<unistd.h>
+
+1627896938 source:/Devel/Stm32Sw/bB101_VCO/C-Tools/imgcnv/Src/main.c
+	<stdio.h>
+	<string.h>
+	<fcntl.h>
+	<errno.h>
+	<termios.h>
+	<unistd.h>
+

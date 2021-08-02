@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1625035505 source:/Devel/Stm32Sw/bB100_Swarm/C-Tools/sinegen/main.c
+	<stdio.h>
+	<stdlib.h>
+
