@@ -1,12 +1,12 @@
 /*
- * bB100_Swarm.h
+ * bB100_VCO.h
  *
  *  Created on: Jun 1, 2021
  *      Author: fil
  */
 
-#ifndef INC_BB101_VCO_BB101_SWARM_H_
-#define INC_BB101_VCO_BB101_SWARM_H_
+#ifndef INC_BB101_VCO_BB101_VCO_H_
+#define INC_BB101_VCO_BB101_VCO_H_
 
 extern	DAC_HandleTypeDef hdac1;
 extern	DMA_HandleTypeDef hdma_dac1_ch2;
@@ -274,4 +274,4 @@ extern	const uint16_t logo[12800] ;
 
 
 
-#endif /* INC_BB101_VCO_BB101_SWARM_H_ */
+#endif /* INC_BB101_VCO_BB101_VCO_H_ */

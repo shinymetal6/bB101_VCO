@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "bB101_Swarm.h"
+#include <bB101_VCO.h>
 
 /* USER CODE END Includes */
 

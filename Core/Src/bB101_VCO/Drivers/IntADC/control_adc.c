@@ -49,17 +49,22 @@ void bB100_Swarm_ControlLoop(void)
 		{
 			SystemFlags.delay_sample_multiplier = (float )DELAY_FEEDBACK_POTCONTROL/4096.0F;
 			SystemFlags.delay_feedback_multiplier = 1.0-SystemFlags.delay_sample_multiplier;
-			//SystemFlags.delay_value = (uint16_t )((float )DELAY_FEEDBACK_POTCONTROL/13.5F);
 		}
 
 		if (( SystemFlags.last_tuner_val != ((TUNER_CONTROL >> 4 ) << 4) ) || (( SystemFlags.oscillator_flags & OSC_FM_PENDING) == OSC_FM_PENDING))
 		{
-			SystemFlags.tuner_delta_multiplier = ((float )TUNER_CONTROL - 2048.0F )/ 2048.0F;
-			SystemFlags.last_tuner_val = (TUNER_CONTROL >> 4 ) << 4;
 			if (( SystemFlags.control_flags & CONTROL_FM) == CONTROL_FM)
-				SystemFlags.oscillator_tuner_constant = (SystemFlags.cv_voltage + SystemFlags.cv_voltage_div_10 * ((float )TUNER_CONTROL / 2048.0F + (float )VCO_FM / 2048.0F)) ;
+			{
+				SystemFlags.tuner_delta_multiplier = ((float )VCO_FM - 2048.0F )/ 2048.0F;
+				SystemFlags.oscillator_tuner_constant = (SystemFlags.cv_voltage + SystemFlags.cv_voltage_div_10 * (float )VCO_FM / 2048.0F ) ;
+			}
 			else
+			{
+				SystemFlags.tuner_delta_multiplier = ((float )TUNER_CONTROL - 2048.0F )/ 2048.0F;
 				SystemFlags.oscillator_tuner_constant = (SystemFlags.cv_voltage + SystemFlags.cv_voltage_div_10 * (float )TUNER_CONTROL / 2048.0F ) ;
+			}
+
+			SystemFlags.last_tuner_val = (TUNER_CONTROL >> 4 ) << 4;
 			SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
 			SystemFlags.oscillator_flags &= ~OSC_FM_PENDING;
 
@@ -69,13 +74,10 @@ void bB100_Swarm_ControlLoop(void)
 		{
 			if ( SystemFlags.last_fm_val != ((VCO_FM >> 4 ) << 4) )
 			{
-				SystemFlags.fm_delta_multiplier = ((float )VCO_FM - 2048.0F )/ 2048.0F;
 				SystemFlags.oscillator_flags |= OSC_FM_PENDING;
 				SystemFlags.last_fm_val = (VCO_FM >> 4 ) << 4;
-				//SystemFlags.oscillator_tuner_constant = (SystemFlags.cv_voltage + SystemFlags.cv_voltage_div_10 * ((float )TUNER_CONTROL / 2048.0F + (float )VCO_FM / 2048.0F)) ;
 			}
 		}
-
 
 		if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED )
 		{
@@ -91,10 +93,6 @@ void bB100_Swarm_ControlLoop(void)
 				{
 					Set_Filter2_Coefficients();
 				}
-/*
-				if ( VCFParameters.filterCutoff < 0.01F )
-					VCFParameters.filterCutoff = 0.01F;
-					*/
 			}
 		}
 

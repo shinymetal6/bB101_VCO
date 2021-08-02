@@ -200,7 +200,7 @@ __attribute__((section(".table"))) static const ScreenTypeDef	Osc_DutyMenu_Scree
 
 __attribute__((section(".table"))) static const ScreenTypeDef	Osc_DeTuneMenu_Screen[] = {
 		{
-				"deTune",
+				"dTune",
 				MENU_X_TITLE,
 				MENU_Y_TITLE,
 				ST7735_BLUE,
@@ -248,7 +248,7 @@ __attribute__((section(".table"))) static const ScreenTypeDef	Osc_DeTuneMenu_Scr
 
 __attribute__((section(".table"))) static const ScreenTypeDef	Osc_VolumeMenu_Screen[] = {
 		{
-				"OSC Vol",
+				"Vol",
 				MENU_X_TITLE,
 				MENU_Y_TITLE,
 				ST7735_BLUE,
@@ -296,7 +296,7 @@ __attribute__((section(".table"))) static const ScreenTypeDef	Osc_VolumeMenu_Scr
 
 __attribute__((section(".table"))) static const ScreenTypeDef	Osc_ADSRMenu_Screen[] = {
 		{
-				"OSC ADSR",
+				"ADSR",
 				MENU_X_TITLE,
 				MENU_Y_TITLE,
 				ST7735_BLUE,
@@ -441,7 +441,7 @@ __attribute__((section(".table"))) static const ScreenTypeDef	Delay_Menu_Screen[
 
 __attribute__((section(".table"))) static const ScreenTypeDef	System_Menu_Screen[] = {
 		{
-				"System",
+				"Sys",
 				MENU_X_TITLE,
 				MENU_Y_TITLE,
 				ST7735_BLUE,
@@ -496,7 +496,7 @@ __attribute__((section(".table"))) static const ScreenTypeDef	System_Menu_Screen
 
 __attribute__((section(".table"))) static const ScreenTypeDef	System_PGM_Menu_Screen[] = {
 		{
-				"Memory",
+				"Mem",
 				MENU_X_TITLE,
 				MENU_Y_TITLE,
 				ST7735_BLUE,
@@ -534,41 +534,6 @@ __attribute__((section(".table"))) static const ScreenTypeDef	System_PGM_Menu_Sc
 				" ",
 		},
 };
-/*
-__attribute__((section(".table"))) static const ScreenTypeDef	System_StorePGM_Menu_Screen[] = {
-		{
-				"Store",
-				MENU_X_TITLE,
-				MENU_Y_TITLE,
-				ST7735_BLUE,
-				ST7735_BLACK
-		},
-		{
-				"PGM num",
-				LINE1_X,
-				LINE1_Y,
-				ST7735_BLUE,
-				ST7735_BLACK
-		},
-		{
-				"STORE",
-				LINE3_X,
-				LINE3_Y,
-				ST7735_BLUE,
-				ST7735_BLACK
-		},
-		{
-				"Return",
-				LINE4_X,
-				LINE4_Y,
-				ST7735_BLUE,
-				ST7735_BLACK
-		},
-		{
-				" ",
-		},
-};
-*/
 
 void Menus_Hilight_Line(ScreenTypeDef *screen, uint16_t old_line_number, uint16_t new_line_number)
 {
