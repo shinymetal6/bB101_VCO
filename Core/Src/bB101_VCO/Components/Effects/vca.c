@@ -7,7 +7,7 @@
 
 #include "main.h"
 
-void AmModulator( uint16_t *buffer_out,uint16_t *buffer_in)
+void Vca( uint16_t *buffer_out,uint16_t *buffer_in)
 {
 uint32_t	i;
 	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)

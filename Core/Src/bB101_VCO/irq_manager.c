@@ -43,7 +43,7 @@ uint16_t	i,start,end;
 		DelayLine(&pipe0[start],&oscout_buffer[start]);
 		Moog_VCF(&pipe1[start],&pipe0[start]);
 	}
-	AmModulator(&signal_out[start],&pipe1[start]);
+	Vca(&signal_out[start],&pipe1[start]);
 	UsbMidiCheck();
 	HAL_GPIO_WritePin(GPIOB, FLAG_Pin, GPIO_PIN_RESET);
 }
