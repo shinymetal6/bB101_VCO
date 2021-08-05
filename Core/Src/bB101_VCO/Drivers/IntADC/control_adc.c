@@ -25,7 +25,7 @@ static void draw_led(void)
 	}
 }
 
-void bB100_Swarm_ControlLoop(void)
+void bB101_Vco_ControlLoop(void)
 {
 	if (( SystemFlags.control_flags & CONTROL_TICK_FLAG ) == CONTROL_TICK_FLAG)
 	{

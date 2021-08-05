@@ -1418,7 +1418,7 @@ ScreenTypeDef	*current_screen;
 
 }
 
-void bB100_Print_Tuner(void)
+void bB101_Print_Tuner(void)
 {
 char 	tmp_buf[5];
 int		value;
@@ -1454,6 +1454,6 @@ uint8_t	i;
 
 void MenusDrawStatus(void)
 {
-	bB100_Print_Tuner();
+	bB101_Print_Tuner();
 }
 

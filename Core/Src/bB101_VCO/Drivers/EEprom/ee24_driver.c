@@ -8,6 +8,7 @@
 #include "main.h"
 
 ProgramTypeDef	Program;
+ProgramTypeDef	CurrentProgram;
 
 uint8_t werr,rerr;
 void ee24_write(uint16_t address, uint8_t *data, size_t len, uint32_t timeout)
@@ -34,6 +35,11 @@ HAL_StatusTypeDef ret;
 void ee24_read_program(uint16_t program_number)
 {
 	ee24_read((program_number+PROGRAM_OFFSET)*PROGRAM_SIZE,(uint8_t *)&Program,PROGRAM_SIZE,100);
+	if (( Program.program_flags0 != BB_EE_MACHINE_FAMILY) || ( Program.program_flags1 != BB_EE_MACHINE_MODEL))
+	{
+		Program.program_flags0 = BB_EE_MACHINE_FAMILY;
+		Program.program_flags1 = BB_EE_MACHINE_MODEL;
+	}
 }
 
 void ee24_write_program(uint16_t program_number)
@@ -46,7 +52,8 @@ uint16_t ee24_load_program(uint16_t program_number)
 uint32_t	i;
 
 	ee24_read_program(program_number);
-	if ( (Program.program_flags & PROGRAM_VALID_MASK) == PROGRAM_VALID_FLAG)
+
+	if (( Program.program_flags0 == BB_EE_MACHINE_FAMILY) && ( Program.program_flags1 == BB_EE_MACHINE_MODEL))
 	{
 		SystemFlags.oscillator_flags 	= ( Program.oscillator_flagsh << 4 ) | Program.oscillator_flagsl;
 		SystemFlags.control_flags 		= ( Program.control_flagsh << 4 ) | Program.control_flagsl;
@@ -82,10 +89,11 @@ uint32_t	i;
 void ee24_store_program(uint16_t program_number)
 {
 uint32_t	i;
+
 /* MIDI compatible program architecture */
 
-	sprintf(Program.start,"bB101#");
-	Program.program_flags = PROGRAM_VALID_FLAG;
+	Program.program_flags0 = BB_EE_MACHINE_FAMILY;
+	Program.program_flags1 = BB_EE_MACHINE_MODEL;
 	Program.oscillator_flagsh = SystemFlags.oscillator_flags >> 4;
 	Program.oscillator_flagsl = SystemFlags.oscillator_flags & 0x0f;
 	Program.control_flagsh = SystemFlags.control_flags >> 4;
@@ -101,7 +109,6 @@ uint32_t	i;
 	Program.osc_wavesh |= (SystemFlags.osc_waves[1] << 2);
 	Program.osc_wavesl = SystemFlags.osc_waves[2];
 	Program.osc_wavesl |= (SystemFlags.osc_waves[3] << 2);
-	Program.end = 'E';
 
 	for(i=0;i<4;i++)
 	{
@@ -116,3 +123,39 @@ uint32_t	i;
 	ee24_write_program(program_number);
 	ee24_read_program(program_number);
 }
+
+void ee24_get_current_program(void)
+{
+uint32_t	i;
+
+/* MIDI compatible program architecture */
+	CurrentProgram.program_flags0 = BB_EE_MACHINE_FAMILY;
+	CurrentProgram.program_flags1 = BB_EE_MACHINE_MODEL;
+	CurrentProgram.oscillator_flagsh = SystemFlags.oscillator_flags >> 4;
+	CurrentProgram.oscillator_flagsl = SystemFlags.oscillator_flags & 0x0f;
+	CurrentProgram.control_flagsh = SystemFlags.control_flags >> 4;
+	CurrentProgram.control_flagsl = SystemFlags.control_flags & 0x0f;
+	CurrentProgram.vcf_flagsh = SystemFlags.vcf_flags >> 4;
+	CurrentProgram.vcf_flagsl = SystemFlags.vcf_flags & 0x0f;
+	CurrentProgram.effect_flagsh = SystemFlags.effect_flags >> 4;
+	CurrentProgram.effect_flagsl = SystemFlags.effect_flags & 0x0f;
+	CurrentProgram.delay_flagsh = SystemFlags.delay_flags >> 4;
+	CurrentProgram.delay_flagsl = SystemFlags.delay_flags & 0x0f;
+	CurrentProgram.delay_value = SystemFlags.delay_value/10;
+	CurrentProgram.osc_wavesh = SystemFlags.osc_waves[0];
+	CurrentProgram.osc_wavesh |= (SystemFlags.osc_waves[1] << 2);
+	CurrentProgram.osc_wavesl = SystemFlags.osc_waves[2];
+	CurrentProgram.osc_wavesl |= (SystemFlags.osc_waves[3] << 2);
+
+	for(i=0;i<4;i++)
+	{
+		CurrentProgram.osc_duty_percent[0] = SystemFlags.osc_duty_percent[0];
+		CurrentProgram.osc_detune[0] = SystemFlags.osc_detune[0];
+		CurrentProgram.osc_volume[0] = SystemFlags.osc_volume[0];
+	}
+	CurrentProgram.Atime = SystemFlags.Atime;
+	CurrentProgram.Dtime = SystemFlags.Dtime;
+	CurrentProgram.Sval = SystemFlags.Sval;
+	CurrentProgram.Rtime = SystemFlags.Rtime;
+}
+

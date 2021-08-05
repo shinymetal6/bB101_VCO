@@ -12,21 +12,15 @@
 
 __attribute__ ((aligned (4)))	uint8_t		midi_rx_buf[MIDI_RXBUF_SIZE];
 __attribute__ ((aligned (4)))	uint8_t		midi_tx_buf[MIDI_RXBUF_SIZE];
-__attribute__ ((aligned (4)))	uint8_t		pgm_copy[PROGRAM_SIZE*2];
+//__attribute__ ((aligned (4)))	uint8_t		pgm_copy[PROGRAM_SIZE*2];
 
 uint16_t SYSEX_ConvertMidiBufOut(uint8_t *buf_out , uint16_t len)
 {
 uint32_t	r=0,k=0;
-/*
-uint32_t	tlen = PROGRAM_SIZE*2;
-uint8_t	*pgm = (uint8_t *)&Program;;
-	for(r=0;r<PROGRAM_SIZE*2;r+=2)
-	{
-		pgm_copy[r] = *pgm & 0x0f;
-		pgm_copy[r+1] = (*pgm >> 4 )& 0x0f;
-	}
-	*/
+
 	midi_tx_buf[k] = SYSEX_STARTC;
+	k++;
+	midi_tx_buf[k] = SYSEX_START;
 	k++;
 	r = 0;
 	while ( r < len )
@@ -36,42 +30,97 @@ uint8_t	*pgm = (uint8_t *)&Program;;
 		k++;
 		if ( (k & 0x03 ) == 0)
 		{
-			if (( len - r ) == 3)
+			if (( len - r ) == 2)
 				midi_tx_buf[k] = SYSEX_END_3;
-			else if (( len - r ) == 2)
-				midi_tx_buf[k] = SYSEX_END_2;
 			else if (( len - r ) == 1)
+				midi_tx_buf[k] = SYSEX_END_2;
+			else if (( len - r ) == 0)
 				midi_tx_buf[k] = SYSEX_END_1;
 			else
 				midi_tx_buf[k] = SYSEX_STARTC;
 			k++;
 		}
 	}
-	return k+2;
+	midi_tx_buf[k] = SYSEX_END;
+	while ((k & 0x03 ) != 0 )
+		k++;
+	return k;
 }
 
-void DumpSystemFlags(void)
-{
-
-}
-
+//#define		TEST_MIDI_OUT	1
 void DumpProgram(uint8_t program_number)
 {
-	/*
+uint16_t	i;
 uint32_t	Len;
-uint8_t		buf[256];
 
-	ee24_read_program(program_number);
-	sprintf((char *)buf,"0123456789012345678901234567890123456789012345");
-	Len = SYSEX_ConvertMidiBufOut((uint8_t *)&buf[0],strlen((char *)buf));
-	MIDI_Transmit_FS(midi_tx_buf,  Len);
-	*/
-uint32_t	Len;
+	for(i=0;i<MIDI_PROGRAM_SIZE;i++)
+		midi_tx_buf[i] = 0;
+
+#ifdef TEST_MIDI_OUT
+	midi_tx_buf[0] = SYSEX_STARTC;
+	midi_tx_buf[1] = SYSEX_START;
+	midi_tx_buf[2] = 'a';
+	midi_tx_buf[3] = 'b';
+	midi_tx_buf[4] = SYSEX_STARTC;
+	midi_tx_buf[5] = 'c';
+	midi_tx_buf[6] = 'd';
+	midi_tx_buf[7] = 'e';
+	midi_tx_buf[8] = SYSEX_STARTC;
+	midi_tx_buf[9] = 'f';
+	midi_tx_buf[10] = 'g';
+	midi_tx_buf[11] = 'h';
+	midi_tx_buf[12] = SYSEX_STARTC;
+	midi_tx_buf[13] = 'i';
+	midi_tx_buf[14] = 'j';
+	midi_tx_buf[15] = 'k';
+	midi_tx_buf[16] = SYSEX_STARTC;
+	midi_tx_buf[17] = 'l';
+	midi_tx_buf[18] = 'm';
+	midi_tx_buf[19] = 'n';
+	midi_tx_buf[20] = SYSEX_STARTC;
+	midi_tx_buf[21] = 'o';
+	midi_tx_buf[22] = 'p';
+	midi_tx_buf[23] = 'q';
+	midi_tx_buf[24] = SYSEX_STARTC;
+	midi_tx_buf[25] = 'r';
+	midi_tx_buf[26] = 's';
+	midi_tx_buf[27] = 't';
+	midi_tx_buf[28] = SYSEX_STARTC;
+	midi_tx_buf[29] = 'u';
+	midi_tx_buf[30] = 'v';
+	midi_tx_buf[31] = 'w';
+	midi_tx_buf[32] = SYSEX_STARTC;
+	midi_tx_buf[33] = 'x';
+	midi_tx_buf[34] = 'y';
+	midi_tx_buf[35] = 'z';
+	midi_tx_buf[36] = SYSEX_STARTC;
+	midi_tx_buf[37] = '0';
+	midi_tx_buf[38] = '1';
+	midi_tx_buf[39] = '2';
+	midi_tx_buf[40] = SYSEX_END_3;
+	midi_tx_buf[41] = '3';
+	midi_tx_buf[42] = '4';
+	midi_tx_buf[43] = SYSEX_END;
+	Len = MIDI_PROGRAM_SIZE;
+#else
 	ee24_read_program(program_number);
 	Len = SYSEX_ConvertMidiBufOut((uint8_t *)&Program,sizeof(Program));
+#endif
+
 	MIDI_Transmit_FS(midi_tx_buf,  Len);
 }
 
+void DumpCurrentProgram(void)
+{
+uint16_t	i;
+uint32_t	Len;
+
+	for(i=0;i<MIDI_PROGRAM_SIZE;i++)
+		midi_tx_buf[i] = 0;
+	ee24_get_current_program();
+	Len = SYSEX_ConvertMidiBufOut((uint8_t *)&CurrentProgram,sizeof(Program));
+	MIDI_Transmit_FS(midi_tx_buf,  Len);
+}
 
 uint8_t UsbMidiParseNoteOFF(uint8_t channel ,uint8_t midi_note , uint8_t velocity)
 {
@@ -147,6 +196,17 @@ void UsbSysExApplyValues(void)
 {
 uint8_t	osc_number, offset;
 
+	if ( SystemFlags.sysex_buffer[1] == SYS_COMMAND_CMD)
+	{
+		if (( SystemFlags.sysex_buffer[2] == SYSEX_RESET_CMD ) && ( SystemFlags.sysex_buffer[3] == SYSEX_RESET_CMD ))
+			EmergencyReset();
+		if ( SystemFlags.sysex_buffer[2] == SYSEX_DUMP_PROGRAM_CMD )
+			DumpProgram(SystemFlags.sysex_buffer[3] & (NUM_PROGRAMS_MAX-1));
+		if ( SystemFlags.sysex_buffer[2] == SYSEX_DUMP_CURRENT_PROGRAM_CMD )
+			DumpCurrentProgram();
+	}
+
+
 	if ( SystemFlags.sysex_buffer[1] == OSC_ADSR_CMD)
 	{
 		SystemFlags.Atime = SystemFlags.sysex_buffer[2];
@@ -213,6 +273,7 @@ uint8_t	osc_number, offset;
 		offset = SystemFlags.sysex_buffer[2] & 0x03;
 		SystemFlags.osc_volume[offset] = SystemFlags.sysex_buffer[3];
 		ChangeOscillatorVolume(offset);
+		//DisplayVolume();
 	}
 
 	if ( SystemFlags.sysex_buffer[1] == OSC_ALLVOLUME_CMD)
@@ -230,16 +291,6 @@ uint8_t	osc_number, offset;
 		osc_number = SystemFlags.sysex_buffer[2];
 		Oscillator[osc_number].detune = detune_helper(SystemFlags.sysex_buffer[3],SystemFlags.sysex_buffer[4],SystemFlags.sysex_buffer[5],SystemFlags.sysex_buffer[6]);
 		SetDetune(osc_number);
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == SYS_COMMAND_CMD)
-	{
-		if ( SystemFlags.sysex_buffer[2] == SYSEX_RESET_CMD )
-			EmergencyReset();
-		if ( SystemFlags.sysex_buffer[2] == SYSEX_DUMP_SYSFLAGS_CMD )
-			DumpSystemFlags();
-		if ( SystemFlags.sysex_buffer[2] == SYSEX_DUMP_PROGRAM_CMD )
-			DumpProgram(SystemFlags.sysex_buffer[3] & (NUM_PROGRAMS_MAX-1));
 	}
 
 	if ( SystemFlags.sysex_buffer[1] == VCF_SET_CMD)
@@ -272,12 +323,14 @@ uint8_t	i,j=1,k=0;
 		{
 			SystemFlags.sysex_buffer[k] = SystemFlags.midi_rx_buffer[j];
 			SystemFlags.sysex_len+=0;
+			i = len;
 		}
 		if ( SystemFlags.midi_rx_buffer[i] == SYSEX_END_2 )
 		{
 			SystemFlags.sysex_buffer[k] = SystemFlags.midi_rx_buffer[j];
 			SystemFlags.sysex_buffer[k+1] = SystemFlags.midi_rx_buffer[j+1];
 			SystemFlags.sysex_len+=1;
+			i = len;
 		}
 		if ( SystemFlags.midi_rx_buffer[i] == SYSEX_END_3 )
 		{
@@ -285,6 +338,7 @@ uint8_t	i,j=1,k=0;
 			SystemFlags.sysex_buffer[k+1] = SystemFlags.midi_rx_buffer[j+1];
 			SystemFlags.sysex_buffer[k+2] = SystemFlags.midi_rx_buffer[j+2];
 			SystemFlags.sysex_len+=2;
+			i = len;
 		}
 	}
 	if ( SystemFlags.sysex_buffer[SystemFlags.sysex_len] == SYSEX_END )

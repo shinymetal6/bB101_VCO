@@ -14,8 +14,8 @@
 
 typedef struct _ProgramTypeDef
 {
-	char 		start[6];
-	uint8_t 	program_flags;
+	uint8_t 	program_flags0;
+	uint8_t 	program_flags1;
 	uint8_t 	oscillator_flagsh,oscillator_flagsl;
 	uint8_t 	control_flagsh,control_flagsl;
 	uint8_t 	vcf_flagsh,vcf_flagsl;
@@ -27,16 +27,13 @@ typedef struct _ProgramTypeDef
 	uint8_t 	osc_detune[4];
 	uint8_t 	osc_volume[4];	// range 0..10
 	uint8_t 	Atime,Dtime,Sval,Rtime;
-	char 		end;
 }ProgramTypeDef;
 
 extern	ProgramTypeDef	Program;
+extern	ProgramTypeDef	CurrentProgram;
 #define		PROGRAM_SIZE		EEPROM_PAGE_SIZE
 #define		PROGRAM_OFFSET		4
 #define		NUM_PROGRAMS_MAX	64
-
-#define	PROGRAM_VALID_FLAG		0x08
-#define	PROGRAM_VALID_MASK		0x0C
 
 extern	void ee24_write(uint16_t address, uint8_t *data, size_t len, uint32_t timeout);
 extern	void ee24_read(uint16_t address, uint8_t *data, size_t len, uint32_t timeout);
@@ -45,5 +42,6 @@ extern	void ee24_read_program(uint16_t program_number);
 extern	uint16_t ee24_load_program(uint16_t program_number);
 extern	void ee24_store_program(uint16_t program_number);
 extern	void ee24_remove_program(uint16_t program_number);
+extern	void ee24_get_current_program(void);
 
 #endif /* INC_BB101_VCO_DRIVERS_EEPROM_EE24_DRIVER_H_ */

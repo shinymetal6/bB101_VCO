@@ -57,6 +57,9 @@ extern	ADC_HandleTypeDef hadc2;
 #define	USB_BUF_MAX_LEN						256
 #define	BB_MACHINE_NAME						"bB101"
 #define	BB_MACHINE_VERSION					"1.0"
+#define	BB_EE_MACHINE_FAMILY				'1'
+#define	BB_EE_MACHINE_MODEL					0x01
+
 typedef struct _SystemParametersTypeDef
 {
 	char		Header[8];
@@ -231,13 +234,11 @@ extern	SystemFlagsDef			SystemFlags;
 
 extern	void get_limits(uint16_t *start,uint16_t *end);
 extern	uint32_t get_bufferhalf(uint32_t channel);
-extern	void bB100_Swarm_Init(void);
+extern	void bB101_Vco_Init(void);
 extern	void InitialParameters(void);
-extern	void bB100_Swarm_AudioLoop(void);
-extern	void bB100_Print_Tuner(void);
-extern	void bB100_Print_Resonance(void);
-extern	void bB100_Print_Cutoff(void);
-extern	void bB100_Swarm_ControlLoop(void);
+extern	void bB101_Vco_AudioLoop(void);
+extern	void bB101_Print_Tuner(void);
+extern	void bB101_Vco_ControlLoop(void);
 
 extern	void SysTimer_callback(void);
 extern	void ADC_callback(void);

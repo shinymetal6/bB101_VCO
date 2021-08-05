@@ -175,20 +175,22 @@ amidi -p hw:2,0 -S "80 3C 7F"
 
 /* SYSTEM */
 system command example
-amidi -p hw:2,0,0 -S 'F0 30 55  F7'
+amidi -p hw:2,0,0 -S 'F0 30 55 55 F7'
 						  |  | 
-						  |  ------------------------------------	reset oscillators
+						  |  ------------------------------------	reset
 						  ---------------------------------------	system command cmd
 						  
-amidi -p hw:2,0,0 -S 'F0 30 11  F7'
-						  |  | 
-						  |  ------------------------------------	dump system flags
-						  ---------------------------------------	system command cmd
 						  
 amidi -p hw:2,0,0 -S 'F0 30 22 00 F7' -r dump.syx -t 1
 						  |  |  |  
 						  |  |  ---------------------------------	program number
 						  |  ------------------------------------	dump program
+						  ---------------------------------------	system command cmd
+						  
+amidi -p hw:2,0,0 -S 'F0 30 23 00 F7' -r dump.syx -t 1
+						  |  |  |  
+						  |  |  ---------------------------------	( not used )
+						  |  ------------------------------------	dump current program
 						  ---------------------------------------	system command cmd
 						  
 						  

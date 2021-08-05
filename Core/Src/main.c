@@ -121,15 +121,15 @@ int main(void)
   MX_TIM7_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  bB100_Swarm_Init();
+  bB101_Vco_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  bB100_Swarm_AudioLoop();
-	  bB100_Swarm_ControlLoop();
+	  bB101_Vco_AudioLoop();
+	  bB101_Vco_ControlLoop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -64,6 +64,7 @@ extern	void CheckUSB(void);
 #define	SYSEX_RESET_CMD			0x55
 #define	SYSEX_DUMP_SYSFLAGS_CMD	0x11
 #define	SYSEX_DUMP_PROGRAM_CMD	0x22
+#define	SYSEX_DUMP_CURRENT_PROGRAM_CMD	0x23
 
 typedef struct _OscParametersCmdTypeDef
 {
@@ -81,6 +82,8 @@ typedef struct _OscParametersCmdTypeDef
 	uint8_t 	phase;
 	uint8_t 	closing_flag;
 }OscParametersCmdTypeDef;
+
+#define	MIDI_PROGRAM_SIZE	44
 
 extern	void UsbMidiCheck(void);
 

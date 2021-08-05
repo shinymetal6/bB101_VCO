@@ -106,13 +106,13 @@ uint16_t brightness=0;
 		BACKLIGHT_TIMER.Instance->CCR1 = brightness;
 		HAL_Delay(1);
 	}
-	bB100_Swarm_ControlLoop();
+	bB101_Vco_ControlLoop();
 	brightness = FULL_BRIGHTNESS;
 	BACKLIGHT_TIMER.Instance->CCR1 = brightness;
 }
 
-//#define	SKIP_ANIMATION	1
-void bB100_Swarm_Init(void)
+#define	SKIP_ANIMATION	1
+void bB101_Vco_Init(void)
 {
 	InitFromFlash();
 	InitialParameters();
@@ -143,7 +143,7 @@ void bB100_Swarm_Init(void)
 	HAL_TIM_Base_Start(AUDIO_TIMER);
 }
 
-void bB100_Swarm_AudioLoop(void)
+void bB101_Vco_AudioLoop(void)
 {
 uint8_t	i;
 	if (( SystemFlags.audio_flags & AUDIO_READY_FLAG ) == AUDIO_READY_FLAG)
