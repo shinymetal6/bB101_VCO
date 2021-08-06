@@ -8,10 +8,6 @@
 #include "main.h"
 
 __attribute__ ((aligned (4)))	uint16_t	signal_out[SIGNAL_LEN];
-__attribute__ ((aligned (4)))	uint16_t	pipe0[SIGNAL_LEN];
-__attribute__ ((aligned (4)))	uint16_t	pipe1[SIGNAL_LEN];
-__attribute__ ((aligned (16)))	uint32_t	osc_buffer[NUMBER_OF_AUDIO_SAMPLES];
-__attribute__ ((aligned (16)))	uint16_t	oscout_buffer[NUMBER_OF_AUDIO_SAMPLES];
 
 __attribute__ ((aligned (4)))	SystemParametersTypeDef	SystemParameters;
 __attribute__ ((aligned (4)))	SystemFlagsDef			SystemFlags;

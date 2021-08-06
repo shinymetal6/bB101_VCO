@@ -63,10 +63,16 @@ typedef struct _OscillatorsTypeDef
 extern	OscillatorsTypeDef	Oscillator[NUMOSCILLATORS];
 extern	int16_t	wavetab[WAVETABLE_SIZE];
 extern	const int16_t	sinetab[256];
+/*
 extern	uint32_t osc_buffer[NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t	oscout_buffer[NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t pipe0[NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t pipe1[NUMBER_OF_AUDIO_SAMPLES];
+*/
+extern	uint32_t osc_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
+extern	uint16_t oscout_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
+extern	uint16_t pipe0[HALF_NUMBER_OF_AUDIO_SAMPLES];
+extern	uint16_t pipe1[HALF_NUMBER_OF_AUDIO_SAMPLES];
 
 extern	void InitOscillators(void);
 extern	void InitOscillatorsTables(void);
@@ -76,8 +82,8 @@ extern	void SetDetune(uint16_t osc_number);
 extern	void EnableOscillator(uint16_t channel, uint16_t midi_note , uint8_t velocity);
 extern	void DisableAllOscillator(void);
 extern	void SetADSR_oscParams(uint32_t osc_number, uint8_t velocity );
-extern	void RunOscillator32(uint16_t start , uint16_t end);
-extern	void RunOscillator4(uint16_t start , uint16_t end);
+extern	void RunOscillator32(void);
+extern	void RunOscillator4(void);
 
 
 #endif /* INC_BB100_OSCILLATORS_H_ */

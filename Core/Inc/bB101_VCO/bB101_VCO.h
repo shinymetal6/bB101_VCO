@@ -225,8 +225,26 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	DELAY_FEEDBACK_POTCONTROL	SystemFlags.control_adc1_buf[0]
 
 extern uint16_t	signal_out[SIGNAL_LEN];
-extern uint16_t	pipe0[SIGNAL_LEN];
-extern uint16_t	pipe1[SIGNAL_LEN];
+
+#include <Generators/oscillators.h>
+#include <IntADC/control_adc.h>
+#include <Effects/moog_vcf.h>
+#include <Effects/delay_line.h>
+#include <Effects/vca.h>
+#include <Generators/echo.h>
+#include <USB_Midi/midi_note2freq.h>
+#include <USB_Midi/usb_midi.h>
+#include <usbd_midi_if.h>
+#include <Lcd/fonts.h>
+#include <Lcd/Lcd.h>
+#include <Lcd/st7735.h>
+#include <EEprom/ee24_driver.h>
+#include <Buttons/pushbutton.h>
+#include <menus.h>
+#include <adsr_display.h>
+
+#include <string.h>
+#include "math.h"
 
 /* Back declarations for forward files ... */
 extern	SystemParametersTypeDef	SystemParameters;
@@ -247,26 +265,6 @@ extern	void store_system_parameters(void);
 extern	void InitFromFlash(void);
 
 extern	const uint16_t logo[12800] ;
-
-#include <IntADC/control_adc.h>
-#include <Generators/oscillators.h>
-#include <Effects/moog_vcf.h>
-#include <Effects/delay_line.h>
-#include <Effects/vca.h>
-#include <Generators/echo.h>
-#include <USB_Midi/midi_note2freq.h>
-#include <USB_Midi/usb_midi.h>
-#include <usbd_midi_if.h>
-#include <Lcd/fonts.h>
-#include <Lcd/Lcd.h>
-#include <Lcd/st7735.h>
-#include <EEprom/ee24_driver.h>
-#include <Buttons/pushbutton.h>
-#include <menus.h>
-#include <adsr_display.h>
-
-#include <string.h>
-#include "math.h"
 
 #define pi           3.14159265358979323846
 #define	INT_2_NORMALIZED_FLOAT(x)	((float )(x) - 2048.0F) / 2048.0F

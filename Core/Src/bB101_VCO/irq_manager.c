@@ -23,28 +23,29 @@ void get_limits(uint16_t *start,uint16_t *end)
 
 void IrqProcessSamples(void)
 {
-uint16_t	i,start,end;
+uint16_t	start,end;
 
 	HAL_GPIO_WritePin(GPIOB, FLAG_Pin, GPIO_PIN_SET);
-	get_limits(&start,&end);
-	for(i=start;i<end;i++)
-		osc_buffer[i] = 0;
+
 	if (( SystemFlags.oscillator_flags & OSC_SRCFLAG ) == OSC_SRCFLAG)
-		RunOscillator32(start,end);
+		RunOscillator32();
 	else
-		RunOscillator4(start,end);
+		RunOscillator4();
 	if (( SystemFlags.control_flags & CONTROL_OSC_VCF_DLY ) == CONTROL_OSC_VCF_DLY)
 	{
-		Moog_VCF(&pipe0[start],&oscout_buffer[start]);
-		DelayLine(&pipe1[start],&pipe0[start]);
+		Moog_VCF(&pipe0[0],&oscout_buffer[0]);
+		DelayLine(&pipe1[0],&pipe0[0]);
 	}
 	else
 	{
-		DelayLine(&pipe0[start],&oscout_buffer[start]);
-		Moog_VCF(&pipe1[start],&pipe0[start]);
+		DelayLine(&pipe0[0],&oscout_buffer[0]);
+		Moog_VCF(&pipe1[0],&pipe0[0]);
 	}
-	Vca(&signal_out[start],&pipe1[start]);
+
+	get_limits(&start,&end);
+	Vca(&signal_out[start],&oscout_buffer[0]);
 	UsbMidiCheck();
+
 	HAL_GPIO_WritePin(GPIOB, FLAG_Pin, GPIO_PIN_RESET);
 }
 

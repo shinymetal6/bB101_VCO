@@ -41,6 +41,11 @@ __attribute__((section(".table"))) const int16_t        sinetab[WAVETABLE_SIZE] 
 		0x27,0x1e,0x16,0xf,0xa,0x6,0x2,0x1,
 };
 
+__attribute__ ((aligned (4)))	uint16_t	pipe0[HALF_NUMBER_OF_AUDIO_SAMPLES];
+__attribute__ ((aligned (4)))	uint16_t	pipe1[HALF_NUMBER_OF_AUDIO_SAMPLES];
+__attribute__ ((aligned (16)))	uint32_t	osc_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
+__attribute__ ((aligned (16)))	uint16_t	oscout_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
+
 uint16_t        tritab[VOICES][WAVETABLE_SIZE];
 uint16_t        squareval[VOICES];
 
@@ -130,14 +135,15 @@ uint16_t ret_val = 0;	//Oscillator[osc_number].midi_note
 	return (ret_val * Oscillator[osc_number].current_volume ) >> NORMALIZE_SHIFT;
 }
 
-void RunOscillator32(uint16_t start , uint16_t end)
+void RunOscillator32(void)
 {
 uint16_t	i;
 uint8_t		angle,osc_number;
 uint16_t	adsr_value;
 
-	for ( i=start;i<end;i++)
+	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 	{
+		osc_buffer[i] = 0;
 		for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number++)
 		{
 			if ( Oscillator[osc_number].state != OSC_OFF )
@@ -179,18 +185,17 @@ uint16_t	adsr_value;
 	}
 
 	SystemFlags.control_flags &= ~OSC_TUNE_PENDING;
-	for ( i=start;i<end;i++)
+	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 		oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> 18) & (DAC_RESOLUTION-1));
 }
 
-void RunOscillator4(uint16_t start , uint16_t end)
+void RunOscillator4(void)
 {
 float	delta_phase;
-//float 	freq=0;
 uint16_t	i;
 uint8_t		angle,osc_number;
 
-	for ( i=start;i<end;i++)
+	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 	{
 		osc_buffer[i] = 0;
 		for(osc_number=0;osc_number<VOICES;osc_number++)
@@ -210,9 +215,6 @@ uint8_t		angle,osc_number;
 
 			if ( VCO_CV != 0 )
 			{
-				//freq = (float )VCO_CV + (float )VCO_CV/10.0F * (float )TUNER_CONTROL / 2048.0F + Oscillator[osc_number].detune;
-				//freq = SystemFlags.cv_voltage + SystemFlags.cv_voltage_div_10 * (float )TUNER_CONTROL / 2048.0F + Oscillator[osc_number].detune;
-				//delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
 				delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / ( SystemFlags.oscillator_tuner_constant + Oscillator[osc_number].detune));
 				Oscillator[osc_number].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
 			}
