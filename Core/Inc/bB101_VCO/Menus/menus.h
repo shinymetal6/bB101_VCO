@@ -52,17 +52,20 @@
 #define	LINE_X_DUTY_DELTA	21
 
 #define	LINE_X_DUTY		LINE_X_STATUS
-#define	LINE_Y_DUTY		LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+6
+#define	LINE_Y_TDUTY	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+6
+#define	LINE_Y_DUTY		LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+16
 
 #define	LINE_X_DETUNE_DELTA	21
 
 #define	LINE_X_DETUNE	LINE_X_STATUS
-#define	LINE_Y_DETUNE	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+6
+#define	LINE_Y_TDETUNE	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+6
+#define	LINE_Y_DETUNE	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+16
 
 #define	LINE_X_VOLUME_DELTA	21
 
 #define	LINE_X_VOLUME	LINE_X_STATUS
-#define	LINE_Y_VOLUME	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+6
+#define	LINE_Y_TVOLUME	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+6
+#define	LINE_Y_VOLUME	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+16
 
 #define	LINE_X_FILTER	LINE_X_STATUS + 38
 #define	LINE_Y_FILTER	LINE_Y_STATUS+LINE_Y_STATUS_DELTA+OSC_H+35
@@ -126,6 +129,7 @@ extern	void Draw_Waveform(uint8_t oscillator_offset,uint8_t waveform);
 extern	uint8_t ChangeOscillatorDuty(uint8_t oscillator_offset );
 extern	uint8_t ChangeOscillatorDetune(uint8_t oscillator_offset );
 extern	uint8_t ChangeOscillatorVolume(uint8_t oscillator_offset );
+extern	void DisplayVolume(void);
 extern	void DisplayDuty(void);
 extern	void DisplayDetune(void);
 

@@ -88,6 +88,7 @@ typedef struct _SystemFlagsDef
 	uint8_t 	control_flags;
 	uint8_t 	program_number;
 	uint8_t 	systick_counter;
+	uint8_t 	tonormaldisplay_counter;
 	uint8_t 	led_counter;
 	uint8_t 	buttons_flag;
 	uint8_t 	buttons_debounce;
@@ -139,13 +140,15 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	CONTROL_OSC_FROM_MIDI		0x02
 */
 #define	CONTROL_OSC_VCF_DLY			0x01
-#define	CONTROL_FM					0x04
-#define	CONTROL_VCA					0x08
+#define	CONTROL_FM					0x02
+#define	CONTROL_VCA					0x04
+#define	CONTROL_ROLLBACK2ADSR		0x08
 #define	CONTROL_ADC_FLAG			0x10
 #define	CONTROL_TICK_FLAG			0x20
 #define	CONTROL_SYSTICK_FLAG		0x40
 #define	CONTROL_MIDIRX_FLAG			0x80
 
+#define	TIME_FOR_INFO				50
 /* audio_flags values */
 #define	AUDIO_VCO_HALF_FLAG			0x01
 #define	AUDIO_READY_FLAG			0x80

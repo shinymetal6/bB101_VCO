@@ -40,6 +40,18 @@ void bB101_Vco_ControlLoop(void)
 			MenusDrawStatus();
 			poll_pushbtn();
 			draw_led();
+			if (( SystemFlags.control_flags & CONTROL_ROLLBACK2ADSR ) == CONTROL_ROLLBACK2ADSR)
+			{
+				if ( SystemFlags.tonormaldisplay_counter != 0 )
+				{
+					SystemFlags.tonormaldisplay_counter--;
+				}
+				if ( SystemFlags.tonormaldisplay_counter == 0 )
+				{
+					DisplayADSR();
+					SystemFlags.control_flags &= ~CONTROL_ROLLBACK2ADSR;
+				}
+			}
 		}
 	}
 

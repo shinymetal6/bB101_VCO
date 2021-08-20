@@ -141,60 +141,9 @@ uint8_t UsbMidiParseNoteON(uint8_t	channel , uint8_t midi_note , uint8_t velocit
 	return 4;
 }
 
-static float detune_helper(uint8_t hundred, uint8_t tenth,uint8_t unit , uint8_t decimal)
-{
-uint32_t	number;
-	number = ((hundred & 0x0f) * 1000) + ((tenth & 0x0f) * 100) + ((unit & 0x0f) * 10 ) + ((decimal & 0x0f));
-	return (float )number * 0.1F;
-}
-
-uint32_t buf2int(uint8_t *ptr,uint32_t len)
-{
-uint32_t	i,start_val=1 , value=0;
-
-	for(i=0;i<len;i++)
-		start_val *=10;
-	start_val /= 10;
-
-	for(i=0;i<len;i++)
-	{
-		value += (ptr[i] & 0x0f)*start_val;
-		start_val /= 10;
-	}
-	return value;
-}
-uint32_t	cutoff , resonance;
-uint16_t	delay_from_midi;
-void apply_vcf_params(void)
-{
-
-	if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK) == VCF_CONTROL_MIDI)
-	{
-		cutoff = buf2int(&SystemFlags.sysex_buffer[2],4);
-		resonance = buf2int(&SystemFlags.sysex_buffer[6],2);
-		VCFParameters.filterCutoff  = (uint16_t )((float) cutoff * 0.372F);
-		VCFParameters.filterResonance = ((resonance+1)*4096)/100;
-		SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
-		SystemFlags.vcf_flags |= (SystemFlags.sysex_buffer[8] & VCF_TYPE_MASK); // filter type
-	}
-}
-
-void apply_delay_params(void)
-{
-	if (( SystemFlags.delay_flags & DLY_ENABLED) == DLY_ENABLED )
-	{
-		if (( SystemFlags.delay_flags & DLY_MIXER_MIDI_MASK) == DLY_MIXER_MIDI_MASK )
-		{
-			SystemFlags.delay_value = buf2int(&SystemFlags.sysex_buffer[2],3)+1;
-			if ( SystemFlags.delay_value > DELAY_MAX_VALUE )
-				SystemFlags.delay_value = DELAY_MAX_VALUE;
-		}
-	}
-}
-
 void UsbSysExApplyValues(void)
 {
-uint8_t	osc_number, offset;
+uint8_t	osc_number;
 
 	if ( SystemFlags.sysex_buffer[1] == SYS_COMMAND_CMD)
 	{
@@ -228,75 +177,6 @@ uint8_t	osc_number, offset;
 		}
 		DisplayADSR();
 	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_WAVE_CMD)
-	{
-		offset = SystemFlags.sysex_buffer[2] & 0x03;
-		SystemFlags.osc_waves[offset] = SystemFlags.sysex_buffer[3];
-		for(osc_number = 0; osc_number < NUMOSCILLATORS;osc_number+=VOICES)
-			Oscillator[osc_number+offset].waveform = SystemFlags.sysex_buffer[3];
-		SystemFlags.oscillator_flags |= OSC_WAVE_PENDING;
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_ALLWAVE_CMD)
-	{
-		SystemFlags.oscillator_flags &= OSC_SRCFLAG;
-		for(osc_number = 0; osc_number < NUMOSCILLATORS;osc_number++)
-			Oscillator[osc_number].waveform = SystemFlags.sysex_buffer[3];
-		for(osc_number = 0; osc_number < VOICES;osc_number++)
-			SystemFlags.osc_waves[osc_number] = SystemFlags.sysex_buffer[3];
-
-		SystemFlags.oscillator_flags |= OSC_WAVE_PENDING;
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_DUTY_CMD)
-	{
-		offset = SystemFlags.sysex_buffer[2] & 0x03;
-		SystemFlags.osc_duty_percent[offset] = SystemFlags.sysex_buffer[3];
-		ChangeOscillatorDuty(offset);
-		SystemFlags.oscillator_flags |= OSC_DUTY_PENDING;
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_ALLDUTY_CMD)
-	{
-		offset = SystemFlags.sysex_buffer[2] & 0x03;
-		for(osc_number = 0; osc_number < VOICES;osc_number++)
-		{
-			SystemFlags.osc_duty_percent[osc_number] = SystemFlags.sysex_buffer[3];
-			ChangeOscillatorDuty(osc_number);
-		}
-		SystemFlags.oscillator_flags |= OSC_DUTY_PENDING;
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_VOLUME_CMD)
-	{
-		offset = SystemFlags.sysex_buffer[2] & 0x03;
-		SystemFlags.osc_volume[offset] = SystemFlags.sysex_buffer[3];
-		ChangeOscillatorVolume(offset);
-		//DisplayVolume();
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_ALLVOLUME_CMD)
-	{
-		offset = SystemFlags.sysex_buffer[2] & 0x03;
-		for(osc_number = 0; osc_number < VOICES;osc_number++)
-		{
-			SystemFlags.osc_volume[offset] = SystemFlags.sysex_buffer[3];
-			ChangeOscillatorVolume(osc_number);
-		}
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_DETUNE_CMD)
-	{
-		osc_number = SystemFlags.sysex_buffer[2];
-		Oscillator[osc_number].detune = detune_helper(SystemFlags.sysex_buffer[3],SystemFlags.sysex_buffer[4],SystemFlags.sysex_buffer[5],SystemFlags.sysex_buffer[6]);
-		SetDetune(osc_number);
-	}
-
-	if ( SystemFlags.sysex_buffer[1] == VCF_SET_CMD)
-		apply_vcf_params();
-	if ( SystemFlags.sysex_buffer[1] == DLY_SET_CMD)
-		apply_delay_params();
 }
 
 uint8_t UsbMidiParseSysEx(uint8_t	channel , uint8_t sub_command,uint32_t len)
@@ -346,6 +226,110 @@ uint8_t	i,j=1,k=0;
 	return len;
 }
 
+static void change_wave(uint8_t channel, uint8_t value) // value ranges from 0 to 10
+{
+uint8_t	osc_number;
+
+	SystemFlags.osc_waves[channel] = value;
+	for(osc_number = 0; osc_number < NUMOSCILLATORS;osc_number+=VOICES)
+		Oscillator[osc_number+channel].waveform = value;
+	SystemFlags.oscillator_flags |= OSC_WAVE_PENDING;
+}
+
+static void change_volume(uint8_t channel, uint8_t value)
+{
+	SystemFlags.osc_volume[channel] = 0;
+	if ( value != 0 )
+		SystemFlags.osc_volume[channel] = (uint8_t )((float )value * 0.078740157F) +1;
+	ChangeOscillatorVolume(channel);
+	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
+	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
+	DisplayVolume();
+}
+
+static void change_duty(uint8_t channel, uint8_t value) // max_val is 127
+{
+	SystemFlags.osc_duty_percent[channel] = (uint8_t )((float )value * 0.787401575F);
+	ChangeOscillatorDuty(channel);
+	SystemFlags.oscillator_flags |= OSC_DUTY_PENDING;
+	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
+	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
+	DisplayDuty();
+}
+
+static void change_detune(uint8_t channel, uint8_t value)
+{
+	SystemFlags.osc_detune[channel] = (float )value * 0.787401575F;
+	Oscillator[channel].detune = ((float )value  - 64.0F )* 0.787401575F;
+	SetDetune(channel);
+	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
+	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
+	DisplayDetune();
+}
+
+static void change_vcf_resonance( uint8_t value )
+{
+	if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK) == VCF_CONTROL_MIDI)
+		VCFParameters.filterResonance  = (float) value * 0.007874016F;
+}
+
+static void change_vcf_cutoff( uint8_t value )
+{
+	if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK) == VCF_CONTROL_MIDI)
+		VCFParameters.filterCutoff  = (float) value * 0.007874016F;
+}
+
+static void change_vcf_type( uint8_t value )
+{
+	if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK) == VCF_CONTROL_MIDI)
+	{
+		SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
+		SystemFlags.vcf_flags |= value;
+	}
+}
+
+uint8_t	UsbMidiParseControlChange(uint8_t cc_index,uint8_t cc_value)
+{
+	switch(cc_index)
+	{
+	case CC_OSCWAVE0		:
+	case CC_OSCWAVE1		:
+	case CC_OSCWAVE2		:
+	case CC_OSCWAVE3		:
+		change_wave(cc_index & 0x03 ,cc_value & 0x7f);
+		break;
+	case CC_OSCVOLUME0		:
+	case CC_OSCVOLUME1		:
+	case CC_OSCVOLUME2		:
+	case CC_OSCVOLUME3		:
+		change_volume(cc_index & 0x03 ,cc_value & 0x7f);
+		break;
+	case CC_OSCDUTY0		:
+	case CC_OSCDUTY1		:
+	case CC_OSCDUTY2		:
+	case CC_OSCDUTY3		:
+		change_duty(cc_index & 0x03,cc_value & 0x7f);
+		break;
+	case CC_OSCDETUNE0		:
+	case CC_OSCDETUNE1		:
+	case CC_OSCDETUNE2		:
+	case CC_OSCDETUNE3		:
+		change_detune(cc_index & 0x03,cc_value & 0x7f);
+		break;
+	case CC_VCFTYPE		:
+		change_vcf_type(cc_value & 0x7f);
+		break;
+	case CC_VCFFREQUENCY		:
+		change_vcf_cutoff(cc_value & 0x7f);
+		break;
+	case CC_VCFRESONANCE		:
+		change_vcf_resonance(cc_value & 0x7f);
+		break;
+	default : break;
+	}
+	return 4;
+}
+
 void UsbMidiParser(void)
 {
 uint8_t		cmd,channel,midi_note,velocity;
@@ -374,12 +358,12 @@ uint32_t	l_index=0,len;
 			case SYSEX_END_3			:
 				l_index += UsbMidiParseSysEx (channel,cmd,len);
 				break;
-				/*
 			case CONTROL_CHANGE			:
-				l_index += UsbMidiParseControlChange (channel,midi_note,velocity);
+				l_index += UsbMidiParseControlChange (SystemFlags.midi_rx_buffer[l_index+2],SystemFlags.midi_rx_buffer[l_index+3]);
 				break;
+				/*
 			case PROGRAM_CHANGE			:
-				l_index += UsbMidiParseProgramChange (channel,midi_note,velocity);
+				l_index += UsbMidiParseProgramChange (SystemFlags.midi_rx_buffer[l_index+2],SystemFlags.midi_rx_buffer[l_index+3]);
 				break;
 			case POLY_PRESSURE			:
 				l_index += UsbMidiParsePolyPressure (channel,midi_note,velocity);

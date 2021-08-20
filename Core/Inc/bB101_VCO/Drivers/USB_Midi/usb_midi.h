@@ -66,6 +66,31 @@ extern	void CheckUSB(void);
 #define	SYSEX_DUMP_PROGRAM_CMD	0x22
 #define	SYSEX_DUMP_CURRENT_PROGRAM_CMD	0x23
 
+#define	CC_OSCWAVE0				0x00
+#define	CC_OSCWAVE1				0x01
+#define	CC_OSCWAVE2				0x02
+#define	CC_OSCWAVE3				0x03
+#define	CC_OSCVOLUME0			0x04
+#define	CC_OSCVOLUME1			0x05
+#define	CC_OSCVOLUME2			0x06
+#define	CC_OSCVOLUME3			0x07
+#define	CC_OSCDUTY0				0x08
+#define	CC_OSCDUTY1				0x09
+#define	CC_OSCDUTY2				0x0A
+#define	CC_OSCDUTY3				0x0B
+#define	CC_OSCDETUNE0			0x0C
+#define	CC_OSCDETUNE1			0x0D
+#define	CC_OSCDETUNE2			0x0E
+#define	CC_OSCDETUNE3			0x0F
+#define	CC_VCFENABLE			0x10
+#define	CC_VCFTYPE				0x11
+#define	CC_VCFFREQUENCY			0x12
+#define	CC_VCFRESONANCE			0x13
+#define	CC_DLYENABLE			0x20
+#define	CC_DELAYLEN				0x21
+#define	CC_DELAYBALANCE			0x22
+#define	CC_SEQUENCE				0x30
+
 typedef struct _OscParametersCmdTypeDef
 {
 	uint8_t 	opening_flag;

@@ -657,6 +657,7 @@ uint8_t	i,k;
 char 	tmp_buf[16];
 	DisplayClearADSR();
 	k = LINE_X_DUTY;
+	ST7735_WriteString(k,LINE_Y_TDUTY,"Duty", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 	for(i=0;i<4;i++)
 	{
 		sprintf(tmp_buf,"%d",SystemFlags.osc_duty_percent[i]);
@@ -672,6 +673,7 @@ uint8_t	i,k;
 char 	tmp_buf[16];
 	DisplayClearADSR();
 	k = LINE_X_DETUNE;
+	ST7735_WriteString(k,LINE_Y_TDETUNE,"Detune", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 	for(i=0;i<4;i++)
 	{
 		sprintf(tmp_buf,"%d",SystemFlags.osc_detune[i]);
@@ -687,6 +689,7 @@ uint8_t	i,k;
 char 	tmp_buf[16];
 	DisplayClearADSR();
 	k = LINE_X_VOLUME;
+	ST7735_WriteString(k,LINE_Y_TVOLUME,"Volume", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 	for(i=0;i<4;i++)
 	{
 		sprintf(tmp_buf,"%d",SystemFlags.osc_volume[i]);
