@@ -148,6 +148,8 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	CONTROL_SYSTICK_FLAG		0x40
 #define	CONTROL_MIDIRX_FLAG			0x80
 
+#define	CONTROL_MASK_FROMTO_MIDI	(CONTROL_OSC_VCF_DLY|CONTROL_FM|CONTROL_VCA)
+
 #define	TIME_FOR_INFO				50
 /* audio_flags values */
 #define	AUDIO_VCO_HALF_FLAG			0x01
@@ -158,32 +160,22 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	VCF_CONTROL_POT				0x01
 #define	VCF_CONTROL_MIDI			0x02
 #define	VCF_CONTROL_CV				0x04
-#define	VCF_TYPE_LP					0x10
-#define	VCF_TYPE_BP					0x20
-#define	VCF_TYPE_HP					0x40
-#define	VCF_ENABLED					0x80
+#define	VCF_TYPE_LP					0x08
+#define	VCF_TYPE_BP					0x10
+#define	VCF_TYPE_HP					0x20
+#define	VCF_ENABLED					0x40
 #define	VCF_TYPE_MASK				(VCF_TYPE_BP | VCF_TYPE_LP | VCF_TYPE_HP)
 
 /* effect_flags */
 #define	EFFECT_MOOG1				0x01
 #define	EFFECT_MOOG2				0x02
-/* delay_flags values */
 
-/*
-#define	DLY_FLANGER_POT				0x00
-#define	DLY_REVERB_POT				0x01
-#define	DLY_FLANGER_MIDI			0x02
-#define	DLY_REVERB_MIDI				0x03
-#define	DLY_FLANGER_CV				0x04
-#define	DLY_REVERB_CV				0x05
-#define	DLY_FLANGER_DIGITAL			0x06
-#define	DLY_REVERB_DIGITAL			0x07
-*/
+/* delay_flags values */
 #define	DLY_MIXER_FLANGER_POT		0x00
 #define	DLY_MIXER_REVERB_POT		0x01
 #define	DLY_MIXER_FLANGER_MIDI		0x02
 #define	DLY_MIXER_REVERB_MIDI		0x03
-#define	DLY_ENABLED					0x80
+#define	DLY_ENABLED					0x40
 
 #define	DLY_MIXER_POT_MASK			0x02
 #define	DLY_MIXER_MIDI_MASK			0x02

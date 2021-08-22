@@ -240,8 +240,10 @@
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="C-Tools/imgcnv/Startup"/>
-						<entry excluding="Src/bB101_VCO/Drivers/USB_Midi/Class/CDC|Src/bB101_VCO/Components/oscillators_OLD.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="Src/bB101_VCO/Drivers/USB_Midi/Target|Src/bB101_VCO/Drivers/USB_Midi/Core|Src/bB101_VCO/Drivers/USB_Midi/Class/CDC|Src/bB101_VCO/Components/oscillators_OLD.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
+						<entry excluding="App/usbd_desc.c|App/usbd_cdc_if.c|App/usb_device.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_Device"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -322,8 +324,10 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="C-Tools/imgcnv/Startup"/>
-						<entry excluding="Src/bB101_VCO/Drivers/USB_Midi/Class/CDC|Src/bB101_VCO/Components/oscillators_OLD.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="Src/bB101_VCO/Drivers/USB_Midi/Target|Src/bB101_VCO/Drivers/USB_Midi/Core|Src/bB101_VCO/Drivers/USB_Midi/Class/CDC|Src/bB101_VCO/Components/oscillators_OLD.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
+						<entry excluding="App/usbd_desc.c|App/usbd_cdc_if.c|App/usb_device.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_Device"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

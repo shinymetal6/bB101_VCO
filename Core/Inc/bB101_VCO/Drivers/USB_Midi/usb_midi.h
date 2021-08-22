@@ -89,7 +89,11 @@ extern	void CheckUSB(void);
 #define	CC_DLYENABLE			0x20
 #define	CC_DELAYLEN				0x21
 #define	CC_DELAYBALANCE			0x22
-#define	CC_SEQUENCE				0x30
+#define	CC_ATIME				0x30
+#define	CC_DTIME				0x31
+#define	CC_SVAL					0x32
+#define	CC_RTIME				0x33
+#define	CC_SEQUENCE				0x40
 
 typedef struct _OscParametersCmdTypeDef
 {

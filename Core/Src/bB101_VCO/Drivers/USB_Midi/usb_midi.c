@@ -143,8 +143,6 @@ uint8_t UsbMidiParseNoteON(uint8_t	channel , uint8_t midi_note , uint8_t velocit
 
 void UsbSysExApplyValues(void)
 {
-uint8_t	osc_number;
-
 	if ( SystemFlags.sysex_buffer[1] == SYS_COMMAND_CMD)
 	{
 		if (( SystemFlags.sysex_buffer[2] == SYSEX_RESET_CMD ) && ( SystemFlags.sysex_buffer[3] == SYSEX_RESET_CMD ))
@@ -153,29 +151,6 @@ uint8_t	osc_number;
 			DumpProgram(SystemFlags.sysex_buffer[3] & (NUM_PROGRAMS_MAX-1));
 		if ( SystemFlags.sysex_buffer[2] == SYSEX_DUMP_CURRENT_PROGRAM_CMD )
 			DumpCurrentProgram();
-	}
-
-
-	if ( SystemFlags.sysex_buffer[1] == OSC_ADSR_CMD)
-	{
-		SystemFlags.Atime = SystemFlags.sysex_buffer[2];
-		SystemFlags.Dtime = SystemFlags.sysex_buffer[3];
-		SystemFlags.Rtime = SystemFlags.sysex_buffer[4];
-		SystemFlags.Sval  = SystemFlags.sysex_buffer[5];
-		if ( SystemFlags.Atime > ADSR_W )
-			SystemFlags.Atime = ADSR_W;
-		if ( SystemFlags.Dtime > ADSR_W )
-			SystemFlags.Dtime = ADSR_W;
-		if ( SystemFlags.Rtime > ADSR_W )
-			SystemFlags.Rtime = ADSR_W;
-		if ( SystemFlags.Sval > ADSR_H )
-			SystemFlags.Sval = ADSR_H;
-
-		for(osc_number = 0; osc_number < NUMOSCILLATORS;osc_number+=VOICES)
-		{
-			SetADSR_oscParams(osc_number,0);
-		}
-		DisplayADSR();
 	}
 }
 
@@ -226,7 +201,7 @@ uint8_t	i,j=1,k=0;
 	return len;
 }
 
-static void change_wave(uint8_t channel, uint8_t value) // value ranges from 0 to 10
+static void change_wave(uint8_t channel, uint8_t value)
 {
 uint8_t	osc_number;
 
@@ -287,6 +262,43 @@ static void change_vcf_type( uint8_t value )
 		SystemFlags.vcf_flags |= value;
 	}
 }
+static void change_DelayLen( uint8_t value )
+{
+	SystemFlags.delay_value = value*10;
+}
+
+static void change_DelayFlags( uint8_t value )
+{
+	SystemFlags.delay_flags = value;
+	view_delay();
+}
+
+
+uint8_t	atime,dtime,sval,rtime;
+
+static void change_Atime( uint8_t value )
+{
+	atime = value;
+}
+
+static void change_Dtime( uint8_t value )
+{
+	dtime = value;
+}
+
+static void change_Sval( uint8_t value )
+{
+	sval = value;
+}
+
+static void change_Rtime( uint8_t value )
+{
+	SystemFlags.Atime = atime;
+	SystemFlags.Dtime = dtime;
+	SystemFlags.Sval = sval;
+	SystemFlags.Rtime = value;
+	DisplayADSR();
+}
 
 uint8_t	UsbMidiParseControlChange(uint8_t cc_index,uint8_t cc_value)
 {
@@ -324,6 +336,24 @@ uint8_t	UsbMidiParseControlChange(uint8_t cc_index,uint8_t cc_value)
 		break;
 	case CC_VCFRESONANCE		:
 		change_vcf_resonance(cc_value & 0x7f);
+		break;
+	case CC_DLYENABLE		:
+		change_DelayFlags(cc_value & 0x7f);
+		break;
+	case CC_DELAYLEN		:
+		change_DelayLen(cc_value & 0x7f);
+		break;
+	case CC_ATIME		:
+		change_Atime(cc_value & 0x7f);
+		break;
+	case CC_DTIME		:
+		change_Dtime(cc_value & 0x7f);
+		break;
+	case CC_SVAL		:
+		change_Sval(cc_value & 0x7f);
+		break;
+	case CC_RTIME		:
+		change_Rtime(cc_value & 0x7f);
 		break;
 	default : break;
 	}
