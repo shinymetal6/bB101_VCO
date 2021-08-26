@@ -138,7 +138,7 @@ uint16_t ret_val = 0;	//Oscillator[osc_number].midi_note
 void RunOscillator32(void)
 {
 uint16_t	i;
-uint8_t		angle,osc_number;
+uint8_t		angle,osc_number,osc_active = 0 , shft_num = 0;
 uint16_t	adsr_value;
 
 	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
@@ -148,23 +148,24 @@ uint16_t	adsr_value;
 		{
 			if ( Oscillator[osc_number].state != OSC_OFF )
 			{
+				osc_active++;
 				angle = (uint8_t )(Oscillator[osc_number].current_phase >> 8);
 				adsr_value = i_adsr(osc_number,angle );
 
 				if ( Oscillator[osc_number].waveform == SINE )
 				{
-					osc_buffer[i] += (sinetab[angle] * adsr_value );
+					osc_buffer[i] += (uint32_t )((float )(sinetab[angle] * adsr_value )* Oscillator[osc_number].volume);
 				}
 				if ( Oscillator[osc_number].waveform == TRIANGLE )
 				{
-					osc_buffer[i] += (tritab[osc_number & 0x03][angle] * adsr_value );
+					osc_buffer[i] += (uint32_t )((float )(tritab[osc_number & 0x03][angle] * adsr_value )* Oscillator[osc_number].volume);
 				}
 				if ( Oscillator[osc_number].waveform == SQUARE )
 				{
 					if ( angle > squareval[osc_number & 0x03])
-						osc_buffer[i] += ((DAC_RESOLUTION-1) * adsr_value );
+						osc_buffer[i] += (uint32_t )((float )((DAC_RESOLUTION-1) * adsr_value )* Oscillator[osc_number].volume);
 				}
-				osc_buffer[i] = (float )osc_buffer[i] * Oscillator[osc_number].volume;
+				//osc_buffer[i] = (uint32_t )((float )osc_buffer[i] * Oscillator[osc_number].volume);
 
 				Oscillator[osc_number].current_phase += Oscillator[osc_number].delta_phase;
 				if ((( SystemFlags.oscillator_flags & OSC_TUNE_PENDING ) == OSC_TUNE_PENDING) && ( Oscillator[osc_number].midi_note != INVALID_MIDI_NOTE))
@@ -185,8 +186,10 @@ uint16_t	adsr_value;
 	}
 
 	SystemFlags.control_flags &= ~OSC_TUNE_PENDING;
+	shft_num = DAC_RESOLUTION + 1 + (uint8_t )(sqrtf((float )osc_active));
 	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
-		oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> 18) & (DAC_RESOLUTION-1));
+		oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> shft_num) & (DAC_RESOLUTION-1));
+		//oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> 18) & (DAC_RESOLUTION-1));
 }
 
 void RunOscillator4(void)
