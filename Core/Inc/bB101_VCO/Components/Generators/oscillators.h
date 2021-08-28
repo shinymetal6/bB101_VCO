@@ -42,7 +42,7 @@ typedef struct _OscillatorsTypeDef
 	uint8_t 				adsr_state;
 	uint16_t 				adsr_prescaler;
 	uint16_t 				adsr_counter;
-
+/*
 	uint32_t 				a_level;
 	uint32_t 				d_level;
 	uint32_t 				s_level;
@@ -52,7 +52,7 @@ typedef struct _OscillatorsTypeDef
 	uint32_t 				a_step;
 	uint32_t 				d_step;
 	uint32_t 				r_step;
-
+*/
 	float					Alevel;
 	float					Dlevel;
 	float					Slevel;

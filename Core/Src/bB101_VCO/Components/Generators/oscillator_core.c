@@ -50,95 +50,7 @@ __attribute__ ((aligned (16)))	uint16_t	oscout_buffer[HALF_NUMBER_OF_AUDIO_SAMPL
 uint16_t        tritab[VOICES][WAVETABLE_SIZE];
 uint16_t        squareval[VOICES];
 
-//#define	INTEGER 	1
 
-#ifdef INTEGER
-#define	ADSR_CNTR_CONSTANT	1
-#define	ADSR_MULT_FACTOR	1000
-void SetADSR_oscParams(uint32_t osc_number, uint8_t velocity )
-{
-	Oscillator[osc_number].a_level = 0;
-	Oscillator[osc_number].d_level = 0xfff;
-	Oscillator[osc_number].s_level = 0xfff;
-	Oscillator[osc_number].r_level = 0xfff;
-
-	Oscillator[osc_number].a_value = (velocity << 5) | 0x1f;
-	Oscillator[osc_number].d_value = SystemFlags.Sval * (Oscillator[osc_number].a_value/32);
-
-	Oscillator[osc_number].adsr_state = OSC_A_STATE;
-	Oscillator[osc_number].adsr_prescaler = ADSR_CNTR_CONSTANT;
-	Oscillator[osc_number].adsr_counter = 0;
-
-	Oscillator[osc_number].a_step = Oscillator[osc_number].a_value / SystemFlags.Atime;
-	Oscillator[osc_number].d_step = Oscillator[osc_number].d_value / SystemFlags.Dtime;
-	Oscillator[osc_number].r_step = Oscillator[osc_number].s_level / SystemFlags.Rtime;
-
-	if ( Oscillator[osc_number].a_step == 0 )
-		Oscillator[osc_number].a_step = 1;
-	if ( Oscillator[osc_number].d_step == 0 )
-		Oscillator[osc_number].d_step = 1;
-	if ( Oscillator[osc_number].r_step == 0 )
-		Oscillator[osc_number].r_step = 1;
-}
-static uint16_t i_adsr(uint32_t osc_number, uint8_t	angle )
-{
-uint16_t ret_val = 0;	//Oscillator[osc_number].midi_note
-
-	if ( Oscillator[osc_number].state != OSC_OFF )
-	{
-		Oscillator[osc_number].oscillator_age++;
-		{
-			switch(Oscillator[osc_number].adsr_state)
-			{
-			case	OSC_A_STATE:
-				Oscillator[osc_number].a_level +=  Oscillator[osc_number].a_step;
-				if ( Oscillator[osc_number].a_level >= Oscillator[osc_number].a_value )
-				{
-					Oscillator[osc_number].d_level = Oscillator[osc_number].a_level;
-					Oscillator[osc_number].adsr_state = OSC_D_STATE;
-				}
-				ret_val = Oscillator[osc_number].a_level;
-				break;
-			case	OSC_D_STATE:
-				Oscillator[osc_number].d_level -=  Oscillator[osc_number].d_step;
-				if ( Oscillator[osc_number].d_level <= Oscillator[osc_number].d_value )
-				{
-					Oscillator[osc_number].s_level = Oscillator[osc_number].d_level;
-					Oscillator[osc_number].adsr_state = OSC_S_STATE;
-				}
-				ret_val = Oscillator[osc_number].d_level;
-				break;
-			case	OSC_S_STATE:
-				if ( Oscillator[osc_number].state == OSC_GO_OFF)
-				{
-					Oscillator[osc_number].adsr_state = OSC_R_STATE;
-					Oscillator[osc_number].r_level = Oscillator[osc_number].s_level;
-				}
-				ret_val = Oscillator[osc_number].s_level;
-				break;
-			case	OSC_R_STATE:
-				Oscillator[osc_number].r_level -=  Oscillator[osc_number].r_step;
-				if ( Oscillator[osc_number].r_level <= Oscillator[osc_number].r_step )
-					Oscillator[osc_number].adsr_state = ADSR_CLOSE_STATE;
-				ret_val = Oscillator[osc_number].r_level;
-				break;
-			case	ADSR_CLOSE_STATE:
-				if ( angle > 224 )
-				{
-					Oscillator[osc_number].state = OSC_OFF;
-					Oscillator[osc_number].current_volume = 0;
-					Oscillator[osc_number].midi_note = INVALID_MIDI_NOTE;
-					Oscillator[osc_number].oscillator_age = 0;
-				}
-				ret_val = 0;
-				break;
-			}
-		}
-	}
-	return (ret_val * Oscillator[osc_number].current_volume ) >> NORMALIZE_SHIFT;
-}
-#else
-//#define	STEP_UNIT	1.0F / (float )(SAMPLE_FREQUENCY)
 #define	STEP_UNIT	(float )((SAMPLE_FREQUENCY) / 1000.0F)
 float	stunit;
 void SetADSR_oscParams(uint32_t osc_number, uint8_t velocity )
@@ -225,7 +137,6 @@ float ret_val = 0.0F;	//Oscillator[osc_number].midi_note
 	}
 	return (uint16_t )ret_val;
 }
-#endif
 
 void RunOscillator32(void)
 {
