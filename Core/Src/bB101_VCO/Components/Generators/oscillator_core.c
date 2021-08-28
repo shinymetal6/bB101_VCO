@@ -171,7 +171,12 @@ uint16_t	adsr_value;
 				{
 					float	delta_phase;
 					float	freq;
-					freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune;
+					float 	deltaPre;
+					float 	delta=0;
+
+					deltaPre = midi_freq[Oscillator[osc_number].midi_note+1] - midi_freq[Oscillator[osc_number].midi_note];
+					delta = SystemFlags.tuner_delta_multiplier * deltaPre;
+					freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune  + delta;
 					delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
 					Oscillator[osc_number].current_phase += (uint16_t )(delta_phase * (float )INT_PRECISION);
 				}

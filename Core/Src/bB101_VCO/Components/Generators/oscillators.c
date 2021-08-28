@@ -9,10 +9,6 @@
 #include "main.h"
 #include "math.h"
 
-//__attribute__ ((aligned (16))) uint16_t	osc_buffer[NUMBER_OF_AUDIO_SAMPLES];
-//__attribute__ ((aligned (16))) uint32_t	osc_buffer[NUMBER_OF_AUDIO_SAMPLES];
-//__attribute__ ((aligned (16))) uint16_t	oscout_buffer[NUMBER_OF_AUDIO_SAMPLES];
-//__attribute__ ((aligned (16))) uint16_t	pipe0[NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (16))) OscillatorsTypeDef	Oscillator[NUMOSCILLATORS];
 
 uint32_t FindOscillatorByMidiNote(uint8_t midi_note)
@@ -24,11 +20,13 @@ uint32_t	osc_number;
 	return NUMOSCILLATORS+1;
 }
 
-uint8_t			osc_ret = 0;
-uint32_t		oldest_osc=0;
+
 uint32_t FindFreeOscillator(void)
 {
 uint32_t		osc_number;
+uint8_t			osc_ret = 0;
+uint32_t		oldest_osc=0;
+
 	for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number+=VOICES)
 	{
 		if ( Oscillator[osc_number].state == OSC_OFF )
@@ -71,16 +69,7 @@ uint8_t	osc_number;
 
 void SetDetune(uint16_t osc_number)
 {
-	/*
-float	delta_phase;
-float	freq;
-	freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune;
-	delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
-	Oscillator[osc_number].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
-	*/
-
 	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
-
 }
 
 uint8_t		already_on=0;
@@ -98,7 +87,6 @@ uint32_t	osc_number,i;
 		Oscillator[osc_number+i].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
 		Oscillator[osc_number+i].current_phase = 0;
 		Oscillator[osc_number+i].midi_note = midi_note;
-		//Oscillator[osc_number+i].current_volume = (velocity << 5) | 0x1f;
 		Oscillator[osc_number+i].state = OSC_ON;
 		Oscillator[osc_number+i].oscillator_age = 0;
 		Oscillator[osc_number+i].adsr_state = OSC_A_STATE;
