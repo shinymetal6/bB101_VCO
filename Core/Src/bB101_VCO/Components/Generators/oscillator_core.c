@@ -43,14 +43,18 @@ __attribute__((section(".table"))) const int16_t        sinetab[WAVETABLE_SIZE] 
 
 __attribute__ ((aligned (4)))	uint16_t	pipe0[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (4)))	uint16_t	pipe1[HALF_NUMBER_OF_AUDIO_SAMPLES];
+__attribute__ ((aligned (16)))	uint32_t	osc_buffer_gen[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (16)))	uint32_t	osc_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (16)))	uint16_t	oscout_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
 
 uint16_t        tritab[VOICES][WAVETABLE_SIZE];
 uint16_t        squareval[VOICES];
 
-#define	ADSR_CNTR_CONSTANT	1
+//#define	INTEGER 	1
 
+#ifdef INTEGER
+#define	ADSR_CNTR_CONSTANT	1
+#define	ADSR_MULT_FACTOR	1000
 void SetADSR_oscParams(uint32_t osc_number, uint8_t velocity )
 {
 	Oscillator[osc_number].a_level = 0;
@@ -76,7 +80,6 @@ void SetADSR_oscParams(uint32_t osc_number, uint8_t velocity )
 	if ( Oscillator[osc_number].r_step == 0 )
 		Oscillator[osc_number].r_step = 1;
 }
-
 static uint16_t i_adsr(uint32_t osc_number, uint8_t	angle )
 {
 uint16_t ret_val = 0;	//Oscillator[osc_number].midi_note
@@ -134,68 +137,140 @@ uint16_t ret_val = 0;	//Oscillator[osc_number].midi_note
 	}
 	return (ret_val * Oscillator[osc_number].current_volume ) >> NORMALIZE_SHIFT;
 }
+#else
+//#define	STEP_UNIT	1.0F / (float )(SAMPLE_FREQUENCY)
+#define	STEP_UNIT	(float )((SAMPLE_FREQUENCY) / 1000.0F)
+float	stunit;
+void SetADSR_oscParams(uint32_t osc_number, uint8_t velocity )
+{
+	float	Atime,Dtime,Rtime;
+	Atime = 100.0F;
+	Dtime = 100.0F;
+	Rtime = 200.0F;
+	stunit = Atime * (float )((SAMPLE_FREQUENCY) / 1000.0F);
+	Oscillator[osc_number].Alevel = 0;
+
+	Oscillator[osc_number].Avalue = (float )(DAC_RESOLUTION-1);
+	Oscillator[osc_number].Dvalue = (float )((DAC_RESOLUTION-1)*0.7F);
+
+	Oscillator[osc_number].adsr_state = OSC_A_STATE;
+
+	Oscillator[osc_number].Astep = Oscillator[osc_number].Avalue / (Atime * (float )(STEP_UNIT));
+	Oscillator[osc_number].Dstep = Oscillator[osc_number].Dvalue / (Dtime * (float )(STEP_UNIT));
+	Oscillator[osc_number].Rstep = Oscillator[osc_number].Dvalue / (Rtime * (float )(STEP_UNIT));
+
+	if ( Oscillator[osc_number].Astep == 0.0F )
+		Oscillator[osc_number].Astep = 1.0F;
+	if ( Oscillator[osc_number].Dstep == 0.0F )
+		Oscillator[osc_number].Dstep = 1.0F;
+	if ( Oscillator[osc_number].Rstep == 0.0F )
+		Oscillator[osc_number].Rstep = 1.0F;
+}
+
+static uint16_t f_adsr(uint32_t osc_number, uint8_t	angle )
+{
+float ret_val = 0.0F;	//Oscillator[osc_number].midi_note
+
+	if ( Oscillator[osc_number].state != OSC_OFF )
+	{
+		Oscillator[osc_number].oscillator_age++;
+		{
+			switch(Oscillator[osc_number].adsr_state)
+			{
+			case	OSC_A_STATE:
+				Oscillator[osc_number].Alevel +=  Oscillator[osc_number].Astep;
+				if ( Oscillator[osc_number].Alevel >= Oscillator[osc_number].Avalue )
+				{
+					Oscillator[osc_number].Dlevel = Oscillator[osc_number].Alevel;
+					Oscillator[osc_number].adsr_state = OSC_D_STATE;
+				}
+				ret_val = Oscillator[osc_number].Alevel;
+				break;
+			case	OSC_D_STATE:
+				Oscillator[osc_number].Dlevel -=  Oscillator[osc_number].Dstep;
+				if ( Oscillator[osc_number].Dlevel <= Oscillator[osc_number].Dvalue )
+				{
+					Oscillator[osc_number].Slevel = Oscillator[osc_number].Dlevel;
+					Oscillator[osc_number].adsr_state = OSC_S_STATE;
+				}
+				ret_val = Oscillator[osc_number].Dlevel;
+				break;
+			case	OSC_S_STATE:
+				if ( Oscillator[osc_number].state == OSC_GO_OFF)
+				{
+					Oscillator[osc_number].adsr_state = OSC_R_STATE;
+					Oscillator[osc_number].Rlevel = Oscillator[osc_number].Slevel;
+				}
+				ret_val = Oscillator[osc_number].Slevel;
+				break;
+			case	OSC_R_STATE:
+				Oscillator[osc_number].Rlevel -=  Oscillator[osc_number].Rstep;
+				if ( Oscillator[osc_number].Rlevel <= Oscillator[osc_number].Rstep )
+					Oscillator[osc_number].adsr_state = ADSR_CLOSE_STATE;
+				ret_val = Oscillator[osc_number].Rlevel;
+				break;
+			case	ADSR_CLOSE_STATE:
+				if ( angle > 224 )
+				{
+					Oscillator[osc_number].state = OSC_OFF;
+					//Oscillator[osc_number].current_volume = 0;
+					Oscillator[osc_number].midi_note = INVALID_MIDI_NOTE;
+					Oscillator[osc_number].oscillator_age = 0;
+					Oscillator[osc_number].Alevel = 0.0F;
+					ret_val = 0.0F;
+				}
+				break;
+			}
+		}
+	}
+	return (uint16_t )ret_val;
+}
+#endif
 
 void RunOscillator32(void)
 {
 uint16_t	i;
-uint8_t		angle,osc_number,osc_active = 0 , shft_num = 0;
+uint8_t		angle,osc_number;
 uint16_t	adsr_value;
 
 	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
-	{
 		osc_buffer[i] = 0;
-		for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number++)
+	for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number++)
+	{
+		if ( Oscillator[osc_number].state != OSC_OFF )
 		{
-			if ( Oscillator[osc_number].state != OSC_OFF )
+			for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 			{
 				angle = (uint8_t )(Oscillator[osc_number].current_phase >> 8);
-				adsr_value = i_adsr(osc_number,angle );
+				adsr_value = f_adsr(osc_number,angle );
 
 				if ( Oscillator[osc_number].waveform == SINE )
-				{
-					osc_buffer[i] += (uint32_t )((float )(sinetab[angle] * adsr_value )* Oscillator[osc_number].volume);
-					//osc_buffer[i] += (sinetab[angle] * adsr_value );
-				}
+					osc_buffer_gen[i] = (sinetab[angle] * adsr_value );
 				if ( Oscillator[osc_number].waveform == TRIANGLE )
-				{
-					osc_buffer[i] += (uint32_t )((float )(tritab[osc_number & 0x03][angle] * adsr_value )* Oscillator[osc_number].volume);
-					//osc_buffer[i] += (tritab[osc_number & 0x03][angle] * adsr_value );
-				}
+					osc_buffer_gen[i] = (tritab[osc_number & 0x03][angle] * adsr_value );
 				if ( Oscillator[osc_number].waveform == SQUARE )
 				{
 					if ( angle > squareval[osc_number & 0x03])
-						//osc_buffer[i] += ((DAC_RESOLUTION-1) * adsr_value );
-						osc_buffer[i] += (uint32_t )((float )((DAC_RESOLUTION-1) * adsr_value )* Oscillator[osc_number].volume);
+						osc_buffer_gen[i] = ((DAC_RESOLUTION-1) * adsr_value );
 				}
-				//osc_buffer[i] = (uint32_t )((float )osc_buffer[i] * Oscillator[osc_number].volume);
+				osc_buffer[i] += ((float )osc_buffer_gen[i] * Oscillator[osc_number].volume);
 
 				Oscillator[osc_number].current_phase += Oscillator[osc_number].delta_phase;
 				if ((( SystemFlags.oscillator_flags & OSC_TUNE_PENDING ) == OSC_TUNE_PENDING) && ( Oscillator[osc_number].midi_note != INVALID_MIDI_NOTE))
 				{
 					float	delta_phase;
 					float	freq;
-					float 	deltaPre;
-					float 	delta=0;
-
-					deltaPre = midi_freq[Oscillator[osc_number].midi_note+1] - midi_freq[Oscillator[osc_number].midi_note];
-					delta = SystemFlags.tuner_delta_multiplier * deltaPre;
-					freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune + delta;
+					freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune;
 					delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
 					Oscillator[osc_number].current_phase += (uint16_t )(delta_phase * (float )INT_PRECISION);
 				}
 			}
 		}
 	}
-	for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number++)
-	{
-		if ( Oscillator[osc_number].state != OSC_OFF )
-			osc_active++;
-	}
+
 	SystemFlags.control_flags &= ~OSC_TUNE_PENDING;
-	shft_num = DAC_BIT + 2 + (uint8_t )(sqrtf((float )osc_active));
 	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
-		oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> shft_num) & (DAC_RESOLUTION-1));
-		//oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> 18) & (DAC_RESOLUTION-1));
+		oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> 19) & (DAC_RESOLUTION-1));
 }
 
 void RunOscillator4(void)

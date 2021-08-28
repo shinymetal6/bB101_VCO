@@ -42,21 +42,32 @@ typedef struct _OscillatorsTypeDef
 	uint8_t 				adsr_state;
 	uint16_t 				adsr_prescaler;
 	uint16_t 				adsr_counter;
-	int16_t 				a_level;
-	int16_t 				d_level;
-	int16_t 				s_level;
-	int16_t 				r_level;
-	int16_t 				a_value;
-	int16_t 				d_value;
-	int16_t 				a_step;
-	int16_t 				d_step;
-	int16_t 				r_step;
+
+	uint32_t 				a_level;
+	uint32_t 				d_level;
+	uint32_t 				s_level;
+	uint32_t 				r_level;
+	uint32_t 				a_value;
+	uint32_t 				d_value;
+	uint32_t 				a_step;
+	uint32_t 				d_step;
+	uint32_t 				r_step;
+
+	float					Alevel;
+	float					Dlevel;
+	float					Slevel;
+	float					Rlevel;
+	float					Avalue;
+	float					Dvalue;
+	float					Astep;
+	float					Dstep;
+	float					Rstep;
 	uint16_t 				current_phase;
 	uint16_t 				delta_phase;
 	float 					detune;
 	uint16_t 				duty;
 	float 					volume;
-	int16_t 				current_volume;
+	//int16_t 				current_volume;
 }OscillatorsTypeDef;
 
 

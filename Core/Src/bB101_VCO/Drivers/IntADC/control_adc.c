@@ -37,15 +37,29 @@ void bB101_Vco_ControlLoop(void)
 		{
 			SystemFlags.systick_counter = 0;
 			SystemFlags.control_flags |= CONTROL_SYSTICK_FLAG;
-			MenusDrawStatus();
+			bB101_Print_Tuner();
 			poll_pushbtn();
 			draw_led();
 			if (( SystemFlags.control_flags & CONTROL_ROLLBACK2ADSR ) == CONTROL_ROLLBACK2ADSR)
 			{
-				if ( SystemFlags.tonormaldisplay_counter != 0 )
+				if (( SystemFlags.rollback_flags & ROLL_VOLUME ) == ROLL_VOLUME)
 				{
-					SystemFlags.tonormaldisplay_counter--;
+					DisplayVolume();
+					SystemFlags.rollback_flags &= ~ROLL_VOLUME;
 				}
+				if (( SystemFlags.rollback_flags & ROLL_DUTY ) == ROLL_DUTY)
+				{
+					DisplayDuty();
+					SystemFlags.rollback_flags &= ~ROLL_DUTY;
+				}
+				if (( SystemFlags.rollback_flags & ROLL_DETUNE ) == ROLL_DETUNE)
+				{
+					DisplayDetune();
+					SystemFlags.rollback_flags &= ~ROLL_DETUNE;
+				}
+
+				if ( SystemFlags.tonormaldisplay_counter != 0 )
+					SystemFlags.tonormaldisplay_counter--;
 				if ( SystemFlags.tonormaldisplay_counter == 0 )
 				{
 					DisplayADSR();

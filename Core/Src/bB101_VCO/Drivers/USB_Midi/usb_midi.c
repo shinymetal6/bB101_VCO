@@ -218,8 +218,8 @@ static void change_volume(uint8_t channel, uint8_t value)
 		SystemFlags.osc_volume[channel] = (uint8_t )((float )value * 0.078740157F) +1;
 	ChangeOscillatorVolume(channel);
 	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
+	SystemFlags.rollback_flags |= ROLL_VOLUME;
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
-	DisplayVolume();
 }
 
 static void change_duty(uint8_t channel, uint8_t value) // max_val is 127
@@ -228,18 +228,19 @@ static void change_duty(uint8_t channel, uint8_t value) // max_val is 127
 	ChangeOscillatorDuty(channel);
 	SystemFlags.oscillator_flags |= OSC_DUTY_PENDING;
 	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
+	SystemFlags.rollback_flags |= ROLL_DUTY;
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
-	DisplayDuty();
 }
 
 static void change_detune(uint8_t channel, uint8_t value)
 {
-	SystemFlags.osc_detune[channel] = (float )value * 0.787401575F;
-	Oscillator[channel].detune = ((float )value  - 64.0F )* 0.787401575F;
-	SetDetune(channel);
+float	 detune;
+	detune = midi_freq[Oscillator[channel].midi_note]*0.2F;
+	Oscillator[channel].detune = detune * (value/512.0F);
+	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
 	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
+	SystemFlags.rollback_flags |= ROLL_DETUNE;
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
-	DisplayDetune();
 }
 
 static void change_vcf_resonance( uint8_t value )

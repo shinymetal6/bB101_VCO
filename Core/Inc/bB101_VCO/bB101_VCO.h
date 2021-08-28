@@ -86,6 +86,7 @@ typedef struct _SystemFlagsDef
 	uint8_t 	delay_flags;
 	uint16_t 	delay_value;
 	uint8_t 	control_flags;
+	uint8_t 	rollback_flags;
 	uint8_t 	program_number;
 	uint8_t 	systick_counter;
 	uint8_t 	tonormaldisplay_counter;
@@ -126,6 +127,11 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	OSC_FM_PENDING				0x20
 #define	OSC_TUNE_PENDING			0x40
 #define	OSC_SRCFLAG					0x80	/* 0 is from Cv , 1 is from MIDI */
+
+/* rollback_flags */
+#define	ROLL_VOLUME					0x01
+#define	ROLL_DUTY					0x02
+#define	ROLL_DETUNE					0x04
 
 /* buttons_flags values */
 #define	BUTTON_TACT0	1

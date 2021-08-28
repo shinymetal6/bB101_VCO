@@ -24,18 +24,28 @@ uint32_t	osc_number;
 	return NUMOSCILLATORS+1;
 }
 
+uint8_t			osc_ret = 0;
+uint32_t		oldest_osc=0;
 uint32_t FindFreeOscillator(void)
 {
-uint32_t	osc_number;
-int8_t		oldest_osc=0;
-	for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number++)
+uint32_t		osc_number;
+	for(osc_number=0;osc_number<NUMOSCILLATORS;osc_number+=VOICES)
 	{
 		if ( Oscillator[osc_number].state == OSC_OFF )
+		{
 			return osc_number;
-		if ( Oscillator[osc_number].oscillator_age > oldest_osc )
-			oldest_osc = osc_number;
+		}
+		else
+		{
+			if ( Oscillator[osc_number].oscillator_age > oldest_osc )
+			{
+				oldest_osc = Oscillator[osc_number].oscillator_age;
+				osc_ret = osc_number;
+			}
+		}
 	}
-	return oldest_osc;
+	oldest_osc=0;
+	return osc_ret;
 }
 
 void DisableOscillator(uint16_t channel, uint16_t midi_note , uint8_t velocity)
@@ -61,11 +71,16 @@ uint8_t	osc_number;
 
 void SetDetune(uint16_t osc_number)
 {
+	/*
 float	delta_phase;
 float	freq;
 	freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune;
 	delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
 	Oscillator[osc_number].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
+	*/
+
+	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
+
 }
 
 uint8_t		already_on=0;
@@ -78,13 +93,12 @@ uint32_t	osc_number,i;
 	osc_number = FindFreeOscillator();
 	freq = midi_freq[midi_note] + Oscillator[osc_number].detune;
 	delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
-
 	for(i=0 ; i< VOICES; i++)
 	{
 		Oscillator[osc_number+i].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
 		Oscillator[osc_number+i].current_phase = 0;
 		Oscillator[osc_number+i].midi_note = midi_note;
-		Oscillator[osc_number+i].current_volume = (velocity << 5) | 0x1f;
+		//Oscillator[osc_number+i].current_volume = (velocity << 5) | 0x1f;
 		Oscillator[osc_number+i].state = OSC_ON;
 		Oscillator[osc_number+i].oscillator_age = 0;
 		Oscillator[osc_number+i].adsr_state = OSC_A_STATE;
