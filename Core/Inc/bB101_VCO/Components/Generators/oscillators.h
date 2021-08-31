@@ -15,6 +15,10 @@
 #define	SINE							0
 #define	TRIANGLE						1
 #define	SQUARE							2
+#define	NOISE							3
+#define	NOISEMODSINE					4
+#define	NOISEMODTRIANGLE				5
+#define	NOISEMODSQUARE					6
 
 #define	OSC_OFF							0
 #define	OSC_GO_OFF						1
@@ -42,17 +46,6 @@ typedef struct _OscillatorsTypeDef
 	uint8_t 				adsr_state;
 	uint16_t 				adsr_prescaler;
 	uint16_t 				adsr_counter;
-/*
-	uint32_t 				a_level;
-	uint32_t 				d_level;
-	uint32_t 				s_level;
-	uint32_t 				r_level;
-	uint32_t 				a_value;
-	uint32_t 				d_value;
-	uint32_t 				a_step;
-	uint32_t 				d_step;
-	uint32_t 				r_step;
-*/
 	float					Alevel;
 	float					Dlevel;
 	float					Slevel;
@@ -65,22 +58,19 @@ typedef struct _OscillatorsTypeDef
 	uint16_t 				current_phase;
 	uint16_t 				delta_phase;
 	float 					detune;
-	uint16_t 				duty;
+	uint8_t 				duty;
 	float 					volume;
-	//int16_t 				current_volume;
+	uint8_t 				noise_weight;
 }OscillatorsTypeDef;
 
 
 extern	OscillatorsTypeDef	Oscillator[NUMOSCILLATORS];
 extern	int16_t	wavetab[WAVETABLE_SIZE];
 extern	const int16_t	sinetab[256];
-/*
-extern	uint32_t osc_buffer[NUMBER_OF_AUDIO_SAMPLES];
-extern	uint16_t	oscout_buffer[NUMBER_OF_AUDIO_SAMPLES];
-extern	uint16_t pipe0[NUMBER_OF_AUDIO_SAMPLES];
-extern	uint16_t pipe1[NUMBER_OF_AUDIO_SAMPLES];
-*/
+
 extern	uint32_t osc_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
+extern	uint16_t noise_buffer_gen[HALF_NUMBER_OF_AUDIO_SAMPLES];
+extern	uint32_t osc_buffer_gen[HALF_NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t oscout_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t pipe0[HALF_NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t pipe1[HALF_NUMBER_OF_AUDIO_SAMPLES];

@@ -22,6 +22,8 @@ int main(int argc, char **argv)
 int len;
     len = read_and_convert("Logo1.bmp");
     save_image("logo",len);
+    len = read_and_convert("noise.bmp");
+    save_image("noise",len);
     len = read_and_convert("sqrw.bmp");
     save_image("sqrw",len);
     len = read_and_convert("tria.bmp");

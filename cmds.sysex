@@ -306,23 +306,33 @@ amidi -p hw:2,0 -S "80 3C 7F"
 #define	CC_OSCDETUNE1			0x0D
 #define	CC_OSCDETUNE2			0x0E
 #define	CC_OSCDETUNE3			0x0F
-#define	CC_VCFENABLE			0x10
-#define	CC_VCFTYPE				0x11
-#define	CC_VCFFREQUENCY			0x12
-#define	CC_VCFRESONANCE			0x13
-#define	CC_DLYENABLE			0x20
-#define	CC_DELAYLEN				0x21
-#define	CC_DELAYBALANCE			0x22
-#define	CC_SEQUENCE				0x30
+#define	CC_NOISE2WAVEWEIGHT0	0x10
+#define	CC_NOISE2WAVEWEIGHT1	0x11
+#define	CC_NOISE2WAVEWEIGHT2	0x12
+#define	CC_NOISE2WAVEWEIGHT3	0x13
+#define	CC_VCFENABLE			0x20
+#define	CC_VCFTYPE				0x21
+#define	CC_VCFFREQUENCY			0x22
+#define	CC_VCFRESONANCE			0x23
+#define	CC_DLYENABLE			0x30
+#define	CC_DELAYLEN				0x31
+#define	CC_DELAYBALANCE			0x32
+#define	CC_DELAYSOURCE			0x33
+#define	CC_ATIME				0x40
+#define	CC_DTIME				0x41
+#define	CC_SVAL					0x42
+#define	CC_RTIME				0x43
+#define	CC_SEQUENCE				0x50
 
 #define	SINE							0
 #define	TRIANGLE						1
 #define	SQUARE							2
-wave ch 0 SINE , ch1 TRIANGLE , ch2 SQUARE and ch3 SINE					  
+#define	NOISE							3
+wave ch 0 SINE , ch1 TRIANGLE , ch2 SQUARE and ch3 NOISE					  
 amidi -p hw:2,0 -S "B0 00 00"	
 amidi -p hw:2,0 -S "B0 01 01"	
-amidi -p hw:2,0 -S "B0 02 01"	
-amidi -p hw:2,0 -S "B0 03 00"	
+amidi -p hw:2,0 -S "B0 02 02"	
+amidi -p hw:2,0 -S "B0 03 03"	
 volume ch 0 max , ch1 min , ch2 half and ch3 semi half					  
 amidi -p hw:2,0 -S "B0 04 7F"	
 amidi -p hw:2,0 -S "B0 05 00"	
@@ -339,37 +349,37 @@ amidi -p hw:2,0 -S "B0 0D 00"
 amidi -p hw:2,0 -S "B0 0E 40"	
 amidi -p hw:2,0 -S "B0 0F 3F"	
 vcf enable
-amidi -p hw:2,0 -S "B0 10 01"
+amidi -p hw:2,0 -S "B0 20 01"
 vcf disable
-amidi -p hw:2,0 -S "B0 10 00"	
-vcf type lp , bp , hp
-amidi -p hw:2,0 -S "B0 11 00"
-amidi -p hw:2,0 -S "B0 11 20"	
-amidi -p hw:2,0 -S "B0 11 40"	
-vcf frequency min, mid and max
-amidi -p hw:2,0 -S "B0 12 00"	
-amidi -p hw:2,0 -S "B0 12 40"	
-amidi -p hw:2,0 -S "B0 12 7F"	
-vcf resonance min, mid and max
-amidi -p hw:2,0 -S "B0 13 00"	
-amidi -p hw:2,0 -S "B0 13 40"	
-amidi -p hw:2,0 -S "B0 13 7F"	
-delay enable
-amidi -p hw:2,0 -S "B0 20 01"	
-delay disable
 amidi -p hw:2,0 -S "B0 20 00"	
-delay len min, mid and max
-amidi -p hw:2,0 -S "B0 21 00"	
+vcf type lp , bp , hp
+amidi -p hw:2,0 -S "B0 21 00"
+amidi -p hw:2,0 -S "B0 21 20"	
 amidi -p hw:2,0 -S "B0 21 40"	
-amidi -p hw:2,0 -S "B0 21 7F"	
-delay balance min, mid and max
+vcf frequency min, mid and max
 amidi -p hw:2,0 -S "B0 22 00"	
 amidi -p hw:2,0 -S "B0 22 40"	
 amidi -p hw:2,0 -S "B0 22 7F"	
-sequence vco->vcf->delay
-amidi -p hw:2,0 -S "B0 30 00"	
-sequence vco->delay->vcf
+vcf resonance min, mid and max
+amidi -p hw:2,0 -S "B0 23 00"	
+amidi -p hw:2,0 -S "B0 23 40"	
+amidi -p hw:2,0 -S "B0 23 7F"	
+delay enable
 amidi -p hw:2,0 -S "B0 30 01"	
+delay disable
+amidi -p hw:2,0 -S "B0 30 00"	
+delay len min, mid and max
+amidi -p hw:2,0 -S "B0 31 00"	
+amidi -p hw:2,0 -S "B0 31 40"	
+amidi -p hw:2,0 -S "B0 31 7F"	
+delay balance min, mid and max
+amidi -p hw:2,0 -S "B0 32 00"	
+amidi -p hw:2,0 -S "B0 32 40"	
+amidi -p hw:2,0 -S "B0 32 7F"	
+sequence vco->vcf->delay
+amidi -p hw:2,0 -S "B0 40 00"	
+sequence vco->delay->vcf
+amidi -p hw:2,0 -S "B0 40 01"	
 
 
 

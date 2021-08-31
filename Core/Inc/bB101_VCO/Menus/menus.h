@@ -126,17 +126,24 @@ extern	void DoMenus(void);
 extern	void MenusDrawStatus(void);
 extern	void MenusDrawEmptyStatus(void);
 extern	void Draw_Waveform(uint8_t oscillator_offset,uint8_t waveform);
-extern	uint8_t ChangeOscillatorDuty(uint8_t oscillator_offset );
+extern	uint8_t ChangeOscillatorDuty(uint8_t oscillator_offset , uint8_t duty );
 extern	uint8_t ChangeOscillatorDetune(uint8_t oscillator_offset );
 extern	uint8_t ChangeOscillatorVolume(uint8_t oscillator_offset );
 extern	void DisplayVolume(void);
 extern	void DisplayDuty(void);
 extern	void DisplayDetune(void);
+extern	void Draw_Filter_Params(void);
+extern	void Draw_Effects(void);
+extern	void View_Sequence(void);
+extern	void View_Delay(void);
+extern	void View_Delay_Val(void);
+
 
 extern	const uint16_t logo[12800];
 extern	const uint16_t sine[196];
 extern	const uint16_t sqrw[196];
 extern	const uint16_t tria[196];
+extern	const uint16_t noise[196];
 
 
 #endif /* INC_BB101_VCO_MENUS_MENUS_H_ */

@@ -71,21 +71,22 @@ unsigned short  bitsPerPixel;
             pixel_index++;
         }
     }
-    printf( "bmp_len*2 %d \n",bmp_len) ;
+    //printf( "bmp_len*2 %d \n",bmp_len) ;
     return bmp_len;
 }
 
 void save_image(char *outfile,int len)
 {
 int i,k=0;
-char fname[32];
-    sprintf(fname,"%s.c",outfile);
+char fname[256];
+    sprintf(fname,"../../Core/Src/bB101_VCO/c_images/%s.c",outfile);
+    printf("Writing on %s\n",fname);
     fpout = fopen (fname, "w");
     fprintf(fpout,"#include \"main.h\"\n");
     fprintf(fpout,"__attribute__((section(\".table\"))) const uint16_t %s[%d] = \n",outfile,len);
     fprintf(fpout,"{\n");
-    printf("uint16_t %s[%d] = \n",outfile,len*2);
-    printf("{\n");
+    //printf("%d bytes\n",len*2);
+    //printf("{\n");
     for(i=0;i<len;i++, k++)
     {
         if ( k == 16)
@@ -97,7 +98,7 @@ char fname[32];
         //printf("\n");
     }
     fprintf(fpout,"\n};\n");
-    printf("};\n");
+    //printf("};\n");
     fclose(fpout);
 
 }

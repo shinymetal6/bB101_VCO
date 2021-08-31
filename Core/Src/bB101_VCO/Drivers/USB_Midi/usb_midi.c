@@ -222,25 +222,35 @@ static void change_volume(uint8_t channel, uint8_t value)
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
 }
 
-static void change_duty(uint8_t channel, uint8_t value) // max_val is 127
+static void change_duty(uint8_t channel, uint8_t value) // max_val is 100
 {
-	SystemFlags.osc_duty_percent[channel] = (uint8_t )((float )value * 0.787401575F);
-	ChangeOscillatorDuty(channel);
+	//SystemFlags.osc_duty_percent[channel] = value;
+	ChangeOscillatorDuty(channel,value);
 	SystemFlags.oscillator_flags |= OSC_DUTY_PENDING;
 	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
 	SystemFlags.rollback_flags |= ROLL_DUTY;
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
 }
 
+#define	DETUNE_SCALING	(100.0F / 127.0F)
 static void change_detune(uint8_t channel, uint8_t value)
 {
 float	 detune;
 	detune = midi_freq[Oscillator[channel].midi_note]*0.2F;
 	Oscillator[channel].detune = detune * (value/512.0F);
 	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
+	SystemFlags.osc_detune[channel] = (uint8_t )((float )value * DETUNE_SCALING);
 	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
 	SystemFlags.rollback_flags |= ROLL_DETUNE;
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
+}
+
+static void change_noiseweight(uint8_t channel, uint8_t value)
+{
+	if (( value > 1 ) && ( value < 7 ))
+		Oscillator[channel].noise_weight = value;
+	else
+		Oscillator[channel].noise_weight = 7;
 }
 
 static void change_vcf_resonance( uint8_t value )
@@ -257,21 +267,48 @@ static void change_vcf_cutoff( uint8_t value )
 
 static void change_vcf_type( uint8_t value )
 {
-	if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK) == VCF_CONTROL_MIDI)
-	{
-		SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
-		SystemFlags.vcf_flags |= value;
-	}
+	SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
+	SystemFlags.vcf_flags |= value;
+	Draw_Filter_Params();
 }
+
+static void change_vcf_source( uint8_t value )
+{
+	SystemFlags.vcf_flags &= ~VCF_CONTROL_MASK;
+	SystemFlags.vcf_flags |= value;
+	Draw_Filter_Params();
+}
+
+static void change_vcf_enable( uint8_t value )
+{
+	if ( value != 0 )
+		SystemFlags.vcf_flags |= VCF_ENABLED;
+	else
+		SystemFlags.vcf_flags &= ~VCF_ENABLED;
+
+	Draw_Filter_Params();
+	View_Sequence();
+}
+
 static void change_DelayLen( uint8_t value )
 {
 	SystemFlags.delay_value = value*10;
+	View_Delay_Val();
 }
 
-static void change_DelayFlags( uint8_t value )
+static void change_DelaySource( uint8_t value )
+{
+	SystemFlags.delay_flags &= ~DLY_MIXER_SOURCE_MASK;
+	SystemFlags.delay_flags |= (value << (DLY_MIXER_SOURCE_MASK-1));
+	View_Delay();
+}
+
+static void change_DelayEnable( uint8_t value )
 {
 	SystemFlags.delay_flags = value;
-	view_delay();
+	View_Sequence();
+	View_Delay();
+	View_Delay_Val();
 }
 
 
@@ -329,6 +366,15 @@ uint8_t	UsbMidiParseControlChange(uint8_t cc_index,uint8_t cc_value)
 	case CC_OSCDETUNE3		:
 		change_detune(cc_index & 0x03,cc_value & 0x7f);
 		break;
+	case CC_NOISE2WAVEWEIGHT0		:
+	case CC_NOISE2WAVEWEIGHT1		:
+	case CC_NOISE2WAVEWEIGHT2		:
+	case CC_NOISE2WAVEWEIGHT3		:
+		change_noiseweight(cc_index & 0x03,cc_value & 0x7f);
+		break;
+	case CC_VCFENABLE		:
+		change_vcf_enable(cc_value & 0x7f);
+		break;
 	case CC_VCFTYPE		:
 		change_vcf_type(cc_value & 0x7f);
 		break;
@@ -338,12 +384,19 @@ uint8_t	UsbMidiParseControlChange(uint8_t cc_index,uint8_t cc_value)
 	case CC_VCFRESONANCE		:
 		change_vcf_resonance(cc_value & 0x7f);
 		break;
+	case CC_VCFSOURCE		:
+		change_vcf_source(cc_value & 0x7f);
+		break;
 	case CC_DLYENABLE		:
-		change_DelayFlags(cc_value & 0x7f);
+		change_DelayEnable(cc_value & 0x7f);
 		break;
 	case CC_DELAYLEN		:
 		change_DelayLen(cc_value & 0x7f);
 		break;
+	case CC_DELAYSOURCE		:
+		change_DelaySource(cc_value & 0x7f);
+		break;
+
 	case CC_ATIME		:
 		change_Atime(cc_value & 0x7f);
 		break;

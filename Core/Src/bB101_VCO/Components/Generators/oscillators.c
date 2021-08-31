@@ -115,7 +115,7 @@ uint16_t	osc_number;
 		Oscillator[osc_number].state = OSC_OFF;
 		Oscillator[osc_number].waveform = SINE;
 		Oscillator[osc_number].midi_note = INVALID_MIDI_NOTE;
-		Oscillator[osc_number].duty = 127;
+		Oscillator[osc_number].duty = 50*DUTY_SCALE;
 		Oscillator[osc_number].volume = 1.0F;
 		freq = midi_freq[69] + Oscillator[osc_number].detune;
 		delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);

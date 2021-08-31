@@ -631,6 +631,7 @@ void Draw_Waveform(uint8_t oscillator_offset,uint8_t waveform)
 	{
 	case	SQUARE		:	ST7735_DrawImage(LINE_X_OSC1W+oscillator_offset*16,LINE_Y_OSCW+1, 14, 14, sqrw); break;
 	case	TRIANGLE	:	ST7735_DrawImage(LINE_X_OSC1W+oscillator_offset*16,LINE_Y_OSCW+1, 14, 14, tria); break;
+	case	NOISE		:	ST7735_DrawImage(LINE_X_OSC1W+oscillator_offset*16,LINE_Y_OSCW+1, 14, 14, noise); break;
 	default				:	ST7735_DrawImage(LINE_X_OSC1W+oscillator_offset*16,LINE_Y_OSCW+1, 14, 14, sine); break; // 's' case
 	}
 }
@@ -640,7 +641,7 @@ uint8_t change_oscillator_waveform(uint8_t oscillator_offset )
 uint8_t	i;
 
 	SystemFlags.osc_waves[oscillator_offset]++;
-	if ( SystemFlags.osc_waves[oscillator_offset] > SQUARE)
+	if ( SystemFlags.osc_waves[oscillator_offset] > NOISE)
 		SystemFlags.osc_waves[oscillator_offset] = SINE;
 
 	for(i=0;i<NUMOSCILLATORS;i+=VOICES)
@@ -713,16 +714,18 @@ uint8_t	i;
 	return 0;
 }
 
-uint8_t ChangeOscillatorDuty(uint8_t oscillator_offset )
+uint8_t ChangeOscillatorDuty(uint8_t oscillator_offset , uint8_t duty)
 {
 uint8_t	i;
+uint32_t	calc_duty;
+	if ( duty > 99 )
+		duty = 99;
 
-	if ( SystemFlags.osc_duty_percent[oscillator_offset] > 99 )
-		SystemFlags.osc_duty_percent[oscillator_offset] = 99;
-
+	SystemFlags.osc_duty_percent[oscillator_offset & 0x03] = duty;
+	calc_duty = (uint32_t )((float )duty*DUTY_SCALE);
 	for(i=0;i<NUMOSCILLATORS;i+=VOICES)
 	{
-		Oscillator[i+oscillator_offset].duty += (uint8_t )((float )SystemFlags.osc_duty_percent[oscillator_offset] * 2.55F );
+		Oscillator[i+oscillator_offset].duty = (uint8_t )calc_duty;
 		ChangeOscillatorWavePhase(i+oscillator_offset,Oscillator[i+oscillator_offset].waveform , Oscillator[i+oscillator_offset].duty );
 	}
 	return 0;
@@ -746,7 +749,7 @@ uint8_t	i;
 	return 0;
 }
 
-void view_sequence(void)
+void View_Sequence(void)
 {
 	ST7735_WriteString(LINE_X_SEQUENCE,LINE_Y_SEQUENCE,"O", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 	if (( SystemFlags.control_flags & CONTROL_OSC_VCF_DLY) == CONTROL_OSC_VCF_DLY)
@@ -774,7 +777,7 @@ void view_sequence(void)
 	}
 }
 
-void view_delay(void)
+void View_Delay(void)
 {
 uint16_t	color;
 
@@ -802,7 +805,7 @@ uint16_t	color;
 	}
 }
 
-void view_delay_val(void)
+void View_Delay_Val(void)
 {
 uint16_t	color = ST7735_GREY;
 char 	tmp_buf[16];
@@ -840,7 +843,7 @@ uint16_t	color;
 }
 
 
-void draw_filter_params(void)
+void Draw_Filter_Params(void)
 {
 uint16_t	color = ST7735_GREY;
 	if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
@@ -860,7 +863,7 @@ uint16_t	color = ST7735_GREY;
 		ST7735_WriteString(LINE_X_CONTROL,LINE_Y_CONTROL,"POT ", Font_7x10, color, ST7735_BLACK);
 }
 
-void draw_effect(void)
+void Draw_Effects(void)
 {
 uint16_t	color = ST7735_GREY;
 	if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
@@ -994,12 +997,12 @@ ScreenTypeDef	*current_screen;
 			}
 			else
 			{
-				if ( SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter-1] < 95 )
-					SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter-1] += 5;
+				if ( SystemFlags.osc_duty[SystemFlags.menu_line_counter-1] < 95 )
+					SystemFlags.osc_duty[SystemFlags.menu_line_counter-1] += 5;
 				else
-					SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter-1] = 5;
+					SystemFlags.osc_duty[SystemFlags.menu_line_counter-1] = 5;
 
-				ChangeOscillatorDuty(SystemFlags.menu_line_counter-1);
+				ChangeOscillatorDuty(SystemFlags.menu_line_counter-1 , SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter]);
 				DisplayDuty();
 			}
 		}
@@ -1131,7 +1134,7 @@ ScreenTypeDef	*current_screen;
 					SystemFlags.effect_flags &= ~EFFECT_MOOG2;
 					SystemFlags.effect_flags |= EFFECT_MOOG1;
 				}
-				draw_effect();
+				Draw_Effects();
 				Clear_VCF_data();
 			}
 
@@ -1156,7 +1159,7 @@ ScreenTypeDef	*current_screen;
 					SystemFlags.vcf_flags |= VCF_TYPE_LP;
 					break;
 				}
-				draw_filter_params();
+				Draw_Filter_Params();
 			}
 			if ( SystemFlags.menu_line_counter == 3) // control
 			{
@@ -1179,7 +1182,7 @@ ScreenTypeDef	*current_screen;
 					SystemFlags.vcf_flags |= VCF_CONTROL_MIDI;
 					break;
 				}
-				draw_filter_params();
+				Draw_Filter_Params();
 			}
 			if ( SystemFlags.menu_line_counter == 4) // enable
 			{
@@ -1191,9 +1194,9 @@ ScreenTypeDef	*current_screen;
 				{
 					SystemFlags.vcf_flags |= VCF_ENABLED;
 				}
-				draw_filter_params();
-				draw_effect();
-				view_sequence();
+				Draw_Filter_Params();
+				Draw_Effects();
+				View_Sequence();
 			}
 			if ( SystemFlags.menu_line_counter == MENU_MAX_VCF_LINE)
 			{
@@ -1217,13 +1220,13 @@ ScreenTypeDef	*current_screen;
 			{
 				if (SystemFlags.delay_value < DELAY_MAX_VALUE )
 					SystemFlags.delay_value += DELAY_DELTA_VALUE;
-				view_delay_val();
+				View_Delay_Val();
 			}
 			if ( SystemFlags.menu_line_counter == 2)
 			{
 				if (SystemFlags.delay_value != 0 )
 					SystemFlags.delay_value -= DELAY_DELTA_VALUE;
-				view_delay_val();
+				View_Delay_Val();
 			}
 			if ( SystemFlags.menu_line_counter == 3)
 			{
@@ -1251,7 +1254,7 @@ ScreenTypeDef	*current_screen;
 					break;
 				}
 				SystemFlags.delay_value = 0;
-				view_delay();
+				View_Delay();
 			}
 			if ( SystemFlags.menu_line_counter == 4)
 			{
@@ -1259,8 +1262,8 @@ ScreenTypeDef	*current_screen;
 					SystemFlags.delay_flags &= ~DLY_ENABLED;
 				else
 					SystemFlags.delay_flags |= DLY_ENABLED;
-				view_delay();
-				view_sequence();
+				View_Delay();
+				View_Sequence();
 			}
 			if ( SystemFlags.menu_line_counter == MENU_MAX_DLY_LINE)
 			{
@@ -1318,7 +1321,7 @@ ScreenTypeDef	*current_screen;
 				{
 					SystemFlags.control_flags |= CONTROL_OSC_VCF_DLY;
 				}
-				view_sequence();
+				View_Sequence();
 			}
 			if ( SystemFlags.menu_line_counter == 5)
 			{
@@ -1365,7 +1368,7 @@ ScreenTypeDef	*current_screen;
 					Draw_Waveform(1 , SystemFlags.osc_waves[1] );
 					Draw_Waveform(2 , SystemFlags.osc_waves[2] );
 					Draw_Waveform(3 , SystemFlags.osc_waves[3] );
-					view_sequence();
+					View_Sequence();
 					SystemFlags.menu_state = MENU_STATE_TOP;
 					change_menu((ScreenTypeDef *)&Main_Menu_Screen,current_screen);
 				}
@@ -1446,11 +1449,11 @@ uint8_t	i;
 		ST7735_WriteString(LINE_X_INPUT_MIDI, LINE_Y_INPUT, "MIDI", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 	}
 
-	view_sequence();
-	view_delay();
-	view_delay_val();
-	draw_filter_params();
-	draw_effect();
+	View_Sequence();
+	View_Delay();
+	View_Delay_Val();
+	Draw_Filter_Params();
+	Draw_Effects();
 	view_am();
 	view_fm();
 }

@@ -22,6 +22,8 @@ extern	TIM_HandleTypeDef htim16;
 extern	ADC_HandleTypeDef hadc1;
 extern	ADC_HandleTypeDef hadc2;
 
+extern	RNG_HandleTypeDef hrng;
+
 /* System */
 #define	SAMPLE_FREQUENCY				44100
 #define	SIGNAL_LEN						256
@@ -162,7 +164,7 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	AUDIO_READY_FLAG			0x80
 
 /* vcf_flags values */
-#define	VCF_CONTROL_MASK			0x0F
+#define	VCF_CONTROL_MASK			0x07
 #define	VCF_CONTROL_POT				0x01
 #define	VCF_CONTROL_MIDI			0x02
 #define	VCF_CONTROL_CV				0x04
@@ -182,6 +184,7 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	DLY_MIXER_FLANGER_MIDI		0x02
 #define	DLY_MIXER_REVERB_MIDI		0x03
 #define	DLY_ENABLED					0x40
+#define	DLY_MIXER_SOURCE_MASK		0x02
 
 #define	DLY_MIXER_POT_MASK			0x02
 #define	DLY_MIXER_MIDI_MASK			0x02
@@ -225,9 +228,13 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 /* RVAR8 */
 #define	DELAY_FEEDBACK_POTCONTROL	SystemFlags.control_adc1_buf[0]
 
+#define	DUTY_SCALE	(256.0F/100.0F)
+
+
 extern uint16_t	signal_out[SIGNAL_LEN];
 
 #include <Generators/oscillators.h>
+#include <Generators/noise.h>
 #include <IntADC/control_adc.h>
 #include <Effects/moog_vcf.h>
 #include <Effects/delay_line.h>

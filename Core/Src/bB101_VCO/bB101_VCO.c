@@ -143,7 +143,10 @@ void bB101_Vco_AudioLoop(void)
 {
 uint8_t	i;
 	if (( SystemFlags.audio_flags & AUDIO_READY_FLAG ) == AUDIO_READY_FLAG)
+	{
 		SystemFlags.audio_flags &= ~AUDIO_READY_FLAG;
+		NoiseFill();
+	}
 	if (( SystemFlags.oscillator_flags & OSC_WAVE_PENDING ) != 0)
 	{
 		for(i=0;i<4;i++)
@@ -153,6 +156,7 @@ uint8_t	i;
 			case	SINE	:	Draw_Waveform(i,SINE); break;
 			case	TRIANGLE:	Draw_Waveform(i,TRIANGLE); break;
 			case	SQUARE	:	Draw_Waveform(i,SQUARE); break;
+			case	NOISE	:	Draw_Waveform(i,NOISE); break;
 			default			:	Draw_Waveform(i,SINE); break;
 			}
 		}

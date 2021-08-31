@@ -82,18 +82,24 @@ extern	void CheckUSB(void);
 #define	CC_OSCDETUNE1			0x0D
 #define	CC_OSCDETUNE2			0x0E
 #define	CC_OSCDETUNE3			0x0F
-#define	CC_VCFENABLE			0x10
-#define	CC_VCFTYPE				0x11
-#define	CC_VCFFREQUENCY			0x12
-#define	CC_VCFRESONANCE			0x13
-#define	CC_DLYENABLE			0x20
-#define	CC_DELAYLEN				0x21
-#define	CC_DELAYBALANCE			0x22
-#define	CC_ATIME				0x30
-#define	CC_DTIME				0x31
-#define	CC_SVAL					0x32
-#define	CC_RTIME				0x33
-#define	CC_SEQUENCE				0x40
+#define	CC_NOISE2WAVEWEIGHT0	0x10
+#define	CC_NOISE2WAVEWEIGHT1	0x11
+#define	CC_NOISE2WAVEWEIGHT2	0x12
+#define	CC_NOISE2WAVEWEIGHT3	0x13
+#define	CC_VCFENABLE			0x20
+#define	CC_VCFTYPE				0x21
+#define	CC_VCFFREQUENCY			0x22
+#define	CC_VCFRESONANCE			0x23
+#define	CC_VCFSOURCE			0x24
+#define	CC_DLYENABLE			0x30
+#define	CC_DELAYLEN				0x31
+#define	CC_DELAYBALANCE			0x32
+#define	CC_DELAYSOURCE			0x33
+#define	CC_ATIME				0x40
+#define	CC_DTIME				0x41
+#define	CC_SVAL					0x42
+#define	CC_RTIME				0x43
+#define	CC_SEQUENCE				0x50
 
 typedef struct _OscParametersCmdTypeDef
 {
