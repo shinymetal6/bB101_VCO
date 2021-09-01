@@ -24,7 +24,7 @@ __attribute__((section(".table"))) static const ScreenTypeDef	Main_Menu_Screen[]
 				ST7735_BLACK
 		},
 		{
-				"VCF",
+				"AFX",
 				LINE2_X,
 				LINE2_Y,
 				ST7735_BLUE,
@@ -342,9 +342,9 @@ __attribute__((section(".table"))) static const ScreenTypeDef	Osc_ADSRMenu_Scree
 		},
 };
 
-__attribute__((section(".table"))) static const ScreenTypeDef	VCF_Menu_Screen[] = {
+__attribute__((section(".table"))) static const ScreenTypeDef	AFX_Menu_Screen[] = {
 		{
-				"VCF",
+				"AFX",
 				MENU_X_TITLE,
 				MENU_Y_TITLE,
 				ST7735_BLUE,
@@ -755,9 +755,9 @@ void View_Sequence(void)
 	if (( SystemFlags.control_flags & CONTROL_OSC_VCF_DLY) == CONTROL_OSC_VCF_DLY)
 	{
 		if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
-			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"V", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
+			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 		else
-			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"V", Font_7x10, ST7735_GREY, ST7735_BLACK);
+			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_GREY, ST7735_BLACK);
 
 		if (( SystemFlags.delay_flags & DLY_ENABLED) == DLY_ENABLED)
 			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"D", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
@@ -771,9 +771,9 @@ void View_Sequence(void)
 		else
 			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"D", Font_7x10, ST7735_GREY, ST7735_BLACK);
 		if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
-			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"V", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
+			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 		else
-			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"V", Font_7x10, ST7735_GREY, ST7735_BLACK);
+			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_GREY, ST7735_BLACK);
 	}
 }
 
@@ -809,12 +809,20 @@ void View_Delay_Val(void)
 {
 uint16_t	color = ST7735_GREY;
 char 	tmp_buf[16];
-	if ( SystemFlags.delay_value < 10 )
-		sprintf(tmp_buf,"  %d",SystemFlags.delay_value);
-	else if ( SystemFlags.delay_value < 100 )
-		sprintf(tmp_buf," %d",SystemFlags.delay_value);
+uint16_t	delay;
+
+	if (( SystemFlags.delay_flags & DLY_MIXER_POT_MASK) == 0 )	// comes from prog
+		delay = SystemFlags.delay_value_from_prog;
 	else
-		sprintf(tmp_buf,"%d",SystemFlags.delay_value);
+		delay = SystemFlags.delay_value_from_midi;
+
+
+	if ( delay < 10 )
+		sprintf(tmp_buf,"  %d",delay);
+	else if ( delay < 100 )
+		sprintf(tmp_buf," %d",delay);
+	else
+		sprintf(tmp_buf,"%d",delay);
 	if (( SystemFlags.delay_flags & DLY_ENABLED) == DLY_ENABLED)
 		color = ST7735_DARKGREEN;
 	ST7735_WriteString(LINE_X_DELAY,LINE_Y_DELAY,tmp_buf, Font_7x10, color, ST7735_BLACK);
@@ -869,10 +877,12 @@ uint16_t	color = ST7735_GREY;
 	if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
 		color = ST7735_DARKGREEN;
 
-	if (( SystemFlags.effect_flags & EFFECT_MOOG1) == EFFECT_MOOG1)
+	if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Moog1", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.effect_flags & EFFECT_MOOG2) == EFFECT_MOOG2)
+	if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Moog2", Font_7x10, color, ST7735_BLACK);
+	if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
+		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Phase", Font_7x10, color, ST7735_BLACK);
 }
 void DoMenus(void)
 {
@@ -897,8 +907,8 @@ ScreenTypeDef	*current_screen;
 			}
 			if ( SystemFlags.menu_line_counter == 2)
 			{
-				SystemFlags.menu_state = MENU_STATE_VCF;
-				change_menu((ScreenTypeDef *)&VCF_Menu_Screen,current_screen);
+				SystemFlags.menu_state = MENU_STATE_AFX;
+				change_menu((ScreenTypeDef *)&AFX_Menu_Screen,current_screen);
 			}
 			if ( SystemFlags.menu_line_counter == 3)
 			{
@@ -1113,26 +1123,31 @@ ScreenTypeDef	*current_screen;
 		}
 		break;
 
-	case	MENU_STATE_VCF:
-		current_screen = (ScreenTypeDef *)&VCF_Menu_Screen;
+	case	MENU_STATE_AFX:
+		current_screen = (ScreenTypeDef *)&AFX_Menu_Screen;
 		if ((( SystemFlags.buttons_flag & BUTTON_TACT0) == BUTTON_TACT0) || (( SystemFlags.buttons_flag & BUTTON_TACT1) == BUTTON_TACT1))
 		{
 			old_line_number = SystemFlags.menu_line_counter;
-			move_menu(current_screen,old_line_number,SystemFlags.menu_line_counter,MENU_MAX_VCF_LINE);
+			move_menu(current_screen,old_line_number,SystemFlags.menu_line_counter,MENU_MAX_EFF_LINE);
 		}
 		if (( SystemFlags.buttons_flag & BUTTON_TACT2) == BUTTON_TACT2)
 		{
 			if ( SystemFlags.menu_line_counter == 1) // band
 			{
-				if (( SystemFlags.effect_flags & EFFECT_MOOG1) == EFFECT_MOOG1)
+				if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
 				{
-					SystemFlags.effect_flags &= ~EFFECT_MOOG1;
-					SystemFlags.effect_flags |= EFFECT_MOOG2;
+					SystemFlags.afx_flags &= ~AFX_MOOG1;
+					SystemFlags.afx_flags |= AFX_MOOG2;
 				}
-				else if (( SystemFlags.effect_flags & EFFECT_MOOG2) == EFFECT_MOOG2)
+				else if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
 				{
-					SystemFlags.effect_flags &= ~EFFECT_MOOG2;
-					SystemFlags.effect_flags |= EFFECT_MOOG1;
+					SystemFlags.afx_flags &= ~AFX_MOOG2;
+					SystemFlags.afx_flags |= AFX_PHASER;
+				}
+				else if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
+				{
+					SystemFlags.afx_flags &= ~AFX_PHASER;
+					SystemFlags.afx_flags |= AFX_MOOG1;
 				}
 				Draw_Effects();
 				Clear_VCF_data();
@@ -1198,7 +1213,7 @@ ScreenTypeDef	*current_screen;
 				Draw_Effects();
 				View_Sequence();
 			}
-			if ( SystemFlags.menu_line_counter == MENU_MAX_VCF_LINE)
+			if ( SystemFlags.menu_line_counter == MENU_MAX_EFF_LINE)
 			{
 				SystemFlags.menu_state = MENU_STATE_TOP;
 				change_menu((ScreenTypeDef *)&Main_Menu_Screen,current_screen);
@@ -1218,14 +1233,14 @@ ScreenTypeDef	*current_screen;
 		{
 			if ( SystemFlags.menu_line_counter == 1)
 			{
-				if (SystemFlags.delay_value < DELAY_MAX_VALUE )
-					SystemFlags.delay_value += DELAY_DELTA_VALUE;
+				if (SystemFlags.delay_value_from_prog < DELAY_MAX_VALUE )
+					SystemFlags.delay_value_from_prog += DELAY_DELTA_VALUE;
 				View_Delay_Val();
 			}
 			if ( SystemFlags.menu_line_counter == 2)
 			{
-				if (SystemFlags.delay_value != 0 )
-					SystemFlags.delay_value -= DELAY_DELTA_VALUE;
+				if (SystemFlags.delay_value_from_prog != 0 )
+					SystemFlags.delay_value_from_prog -= DELAY_DELTA_VALUE;
 				View_Delay_Val();
 			}
 			if ( SystemFlags.menu_line_counter == 3)
@@ -1253,8 +1268,8 @@ ScreenTypeDef	*current_screen;
 					SystemFlags.delay_flags |= DLY_MIXER_FLANGER_POT;
 					break;
 				}
-				SystemFlags.delay_value = 0;
 				View_Delay();
+				View_Delay_Val();
 			}
 			if ( SystemFlags.menu_line_counter == 4)
 			{

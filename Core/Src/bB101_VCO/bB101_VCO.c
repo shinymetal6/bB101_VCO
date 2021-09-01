@@ -38,12 +38,20 @@ void InitFromFlash(void)
 
 void InitialParameters(void)
 {
+	sprintf(SystemParameters.Header,BB_MACHINE_NAME);
+	sprintf(SystemParameters.Version,BB_MACHINE_VERSION);
+	SystemParameters.audio_sampling_frequency = SystemParameters.base_audio_sampling_frequency = SAMPLE_FREQUENCY;
+	SystemParameters.max_detune_percent = MAX_DETUNE_PERCENT_F;
+
 	SystemFlags.oscillator_flags |= OSC_SRCFLAG;
 	SystemFlags.control_flags = CONTROL_OSC_VCF_DLY;
 	SystemFlags.vcf_flags = VCF_CONTROL_POT | VCF_TYPE_LP;
-	SystemFlags.effect_flags |= EFFECT_MOOG1;
+	SystemFlags.vcf_flags |= VCF_ENABLED;
+	SystemFlags.afx_flags |= AFX_MOOG1;
 	SystemFlags.delay_flags = DLY_MIXER_FLANGER_POT;
-	SystemFlags.delay_flags |= DLY_ENABLED;
+	//SystemFlags.delay_flags |= DLY_ENABLED;
+	SystemFlags.delay_value_from_prog = 300;
+	SystemFlags.delay_value_from_midi = 100;
 	SystemFlags.osc_waves[0] = SINE;
 	SystemFlags.osc_waves[1] = SINE;
 	SystemFlags.osc_waves[2] = SINE;
@@ -110,7 +118,7 @@ uint16_t brightness=0;
 #define	SKIP_ANIMATION	1
 void bB101_Vco_Init(void)
 {
-	InitFromFlash();
+	//InitFromFlash();
 	InitialParameters();
 	LcdInit();
 #ifndef	SKIP_ANIMATION
@@ -120,8 +128,12 @@ void bB101_Vco_Init(void)
 	BACKLIGHT_TIMER.Instance->CCR1 = FULL_BRIGHTNESS;
 #endif
 	SystemFlags.systick_counter = 0;
+	PhaserInit();
 
-	SystemFlags.delay_value = 0;
+	Phaser_Rate_set(64);
+	Phaser_Feedback_set(64);
+	Phaser_Wet_set(64);
+
 	HAL_ADC_Start_DMA(CONTROL_ADC1, (uint32_t *)&SystemFlags.control_adc1_buf[0], 4);
 	HAL_ADC_Start_DMA(CONTROL_ADC2, (uint32_t *)&SystemFlags.control_adc2_buf[0], 4);
 	HAL_TIM_Base_Start_IT(CONTROL_TIMER);

@@ -109,15 +109,23 @@ void bB101_Vco_ControlLoop(void)
 		{
 			if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK ) == VCF_CONTROL_POT)
 			{
-				VCFParameters.filterCutoff  	= (float )VCF_CUTOFF_POTCONTROL    / 4096.0F;
-				VCFParameters.filterResonance = (float )VCF_RESONANCE_POTCONTROL / 4096.0F;
-				if (( SystemFlags.effect_flags & EFFECT_MOOG1) == EFFECT_MOOG1)
+				if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
 				{
-					Set_Filter1_Coefficients();
+					Phaser_Rate_set(VCF_CUTOFF_POTCONTROL >> 5);
+					Phaser_Feedback_set(VCF_RESONANCE_POTCONTROL >> 5);
 				}
-				if (( SystemFlags.effect_flags & EFFECT_MOOG2) == EFFECT_MOOG2)
+				else
 				{
-					Set_Filter2_Coefficients();
+					VCFParameters.filterCutoff  	= (float )VCF_CUTOFF_POTCONTROL    / 4096.0F;
+					VCFParameters.filterResonance = (float )VCF_RESONANCE_POTCONTROL / 4096.0F;
+					if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
+					{
+						Set_Filter1_Coefficients();
+					}
+					if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
+					{
+						Set_Filter2_Coefficients();
+					}
 				}
 			}
 		}

@@ -43,6 +43,7 @@ __attribute__((section(".table"))) const int16_t        sinetab[WAVETABLE_SIZE] 
 
 __attribute__ ((aligned (4)))	uint16_t	pipe0[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (4)))	uint16_t	pipe1[HALF_NUMBER_OF_AUDIO_SAMPLES];
+__attribute__ ((aligned (4)))	uint16_t	pipe2[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (16)))	uint32_t	osc_buffer_gen[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (16)))	uint16_t	noise_buffer_gen[HALF_NUMBER_OF_AUDIO_SAMPLES];
 __attribute__ ((aligned (16)))	uint32_t	osc_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];

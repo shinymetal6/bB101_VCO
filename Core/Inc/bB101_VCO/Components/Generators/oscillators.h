@@ -74,6 +74,7 @@ extern	uint32_t osc_buffer_gen[HALF_NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t oscout_buffer[HALF_NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t pipe0[HALF_NUMBER_OF_AUDIO_SAMPLES];
 extern	uint16_t pipe1[HALF_NUMBER_OF_AUDIO_SAMPLES];
+extern	uint16_t pipe2[HALF_NUMBER_OF_AUDIO_SAMPLES];
 
 extern	void InitOscillators(void);
 extern	void InitOscillatorsTables(void);

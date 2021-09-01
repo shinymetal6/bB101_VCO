@@ -43,7 +43,7 @@ uint16_t	start,end;
 	}
 
 	get_limits(&start,&end);
-	Vca(&signal_out[start],&oscout_buffer[0]);
+	Vca(&signal_out[start],&pipe1[0]);
 	UsbMidiCheck();
 
 	HAL_GPIO_WritePin(GPIOB, FLAG_Pin, GPIO_PIN_RESET);

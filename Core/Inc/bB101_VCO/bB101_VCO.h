@@ -26,6 +26,9 @@ extern	RNG_HandleTypeDef hrng;
 
 /* System */
 #define	SAMPLE_FREQUENCY				44100
+#define	SAMPLE_PERIOD					(1.0F / 44100)
+#define _2PI                    		6.283185307F
+#define _PI                    			3.14159265F
 #define	SIGNAL_LEN						256
 #define	DAC_BIT							12
 #define	BIT_RESOLUTION					DAC_BIT
@@ -84,9 +87,10 @@ typedef struct _SystemFlagsDef
 	uint8_t 	osc_duty_percent[4];
 	uint8_t 	Atime,Dtime,Sval,Rtime;
 	uint8_t 	vcf_flags;
-	uint8_t 	effect_flags;
+	uint8_t 	afx_flags;
 	uint8_t 	delay_flags;
-	uint16_t 	delay_value;
+	uint16_t 	delay_value_from_prog;
+	uint16_t 	delay_value_from_midi;
 	uint8_t 	control_flags;
 	uint8_t 	rollback_flags;
 	uint8_t 	program_number;
@@ -174,9 +178,10 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	VCF_ENABLED					0x40
 #define	VCF_TYPE_MASK				(VCF_TYPE_BP | VCF_TYPE_LP | VCF_TYPE_HP)
 
-/* effect_flags */
-#define	EFFECT_MOOG1				0x01
-#define	EFFECT_MOOG2				0x02
+/* afx_flags */
+#define	AFX_MOOG1				0x01
+#define	AFX_MOOG2				0x02
+#define	AFX_PHASER				0x04
 
 /* delay_flags values */
 #define	DLY_MIXER_FLANGER_POT		0x00
@@ -239,6 +244,8 @@ extern uint16_t	signal_out[SIGNAL_LEN];
 #include <Effects/moog_vcf.h>
 #include <Effects/delay_line.h>
 #include <Effects/vca.h>
+#include <Effects/phaser.h>
+#include <Effects/effects_sinetable.h>
 #include <Generators/echo.h>
 #include <USB_Midi/midi_note2freq.h>
 #include <USB_Midi/usb_midi.h>

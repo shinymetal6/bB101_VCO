@@ -89,14 +89,20 @@ uint16_t	i;
 	}
 	else
 	{
-		if ( isnan(VCFParameters.b0) )
-			VCFParameters.b0=VCFParameters.b1=VCFParameters.b2=VCFParameters.b3=VCFParameters.b4=0;
+		if ((( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1) || (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2))
+		{
+			if ( isnan(VCFParameters.b0) )
+				VCFParameters.b0=VCFParameters.b1=VCFParameters.b2=VCFParameters.b3=VCFParameters.b4=0;
+		}
+
 		for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 		{
-			if (( SystemFlags.effect_flags & EFFECT_MOOG1) == EFFECT_MOOG1)
+			if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
 				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_filter1(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
-			else if (( SystemFlags.effect_flags & EFFECT_MOOG2) == EFFECT_MOOG2)
+			else if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
 				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_filter2(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
+			else if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
+				*buffer_out++ = (uint16_t )Phaser_compute((float )buffer_in[i] );
 			else
 				*buffer_out++ = *buffer_in++;
 		}

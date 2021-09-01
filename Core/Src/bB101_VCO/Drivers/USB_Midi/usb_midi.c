@@ -292,7 +292,7 @@ static void change_vcf_enable( uint8_t value )
 
 static void change_DelayLen( uint8_t value )
 {
-	SystemFlags.delay_value = value*10;
+	SystemFlags.delay_value_from_midi = value*10;
 	View_Delay_Val();
 }
 
