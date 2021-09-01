@@ -97,6 +97,10 @@ float Phaser_compute(float xin)
 
 	yout = (1 - wet) * xin + wet * yout;
 
+	/*
+	yout = (yout > 1.0f) ? 1.0f : yout; //clip too loud samples
+	yout = (yout < -1.0f) ? -1.0f : yout;
+	*/
 	return yout*0.9f;
 }
 

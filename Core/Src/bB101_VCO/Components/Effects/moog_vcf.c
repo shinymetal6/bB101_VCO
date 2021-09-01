@@ -101,6 +101,10 @@ uint16_t	i;
 				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_filter1(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
 			else if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
 				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_filter2(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
+			else if (( SystemFlags.afx_flags & AFX_RESF1) == AFX_RESF1)
+				*buffer_out++ = (uint16_t )SVF_FilterSample(0,(float )buffer_in[i] );
+			else if (( SystemFlags.afx_flags & AFX_RESF1) == AFX_RESF2)
+				*buffer_out++ = (uint16_t )SVF_FilterSample(1,(float )buffer_in[i] );
 			else if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
 				*buffer_out++ = (uint16_t )Phaser_compute((float )buffer_in[i] );
 			else

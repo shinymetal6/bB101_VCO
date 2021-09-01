@@ -115,6 +115,16 @@ uint16_t brightness=0;
 	BACKLIGHT_TIMER.Instance->CCR1 = brightness;
 }
 
+
+void AFX_Init(void)
+{
+	PhaserInit();
+	Phaser_Rate_set(64);
+	Phaser_Feedback_set(64);
+	Phaser_Wet_set(64);
+	SVF_init();
+}
+
 #define	SKIP_ANIMATION	1
 void bB101_Vco_Init(void)
 {
@@ -128,12 +138,7 @@ void bB101_Vco_Init(void)
 	BACKLIGHT_TIMER.Instance->CCR1 = FULL_BRIGHTNESS;
 #endif
 	SystemFlags.systick_counter = 0;
-	PhaserInit();
-
-	Phaser_Rate_set(64);
-	Phaser_Feedback_set(64);
-	Phaser_Wet_set(64);
-
+	AFX_Init();
 	HAL_ADC_Start_DMA(CONTROL_ADC1, (uint32_t *)&SystemFlags.control_adc1_buf[0], 4);
 	HAL_ADC_Start_DMA(CONTROL_ADC2, (uint32_t *)&SystemFlags.control_adc2_buf[0], 4);
 	HAL_TIM_Base_Start_IT(CONTROL_TIMER);
