@@ -1,2 +1,2 @@
 # bB101_VCO
-32 oscillators with patches from sysex
+32 oscillators with filters and phaser
