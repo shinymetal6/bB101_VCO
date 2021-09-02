@@ -67,12 +67,6 @@ uint8_t	osc_number;
 	}
 }
 
-void SetDetune(uint16_t osc_number)
-{
-	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
-}
-
-uint8_t		already_on=0;
 void EnableOscillator(uint16_t channel, uint16_t midi_note , uint8_t velocity)
 {
 float	delta_phase;
@@ -80,23 +74,26 @@ float	freq;
 uint32_t	osc_number,i;
 
 	osc_number = FindFreeOscillator();
-	freq = midi_freq[midi_note] + Oscillator[osc_number].detune;
-	delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
 	for(i=0 ; i< VOICES; i++)
 	{
+		freq = midi_freq[midi_note] + SystemFlags.fosc_detune[i]  + SystemFlags.tuner_delta_multiplier;
+		delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
 		Oscillator[osc_number+i].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
 		Oscillator[osc_number+i].current_phase = 0;
 		Oscillator[osc_number+i].midi_note = midi_note;
 		Oscillator[osc_number+i].state = OSC_ON;
 		Oscillator[osc_number+i].oscillator_age = 0;
 		Oscillator[osc_number+i].adsr_state = OSC_A_STATE;
+		Oscillator[osc_number+i].volume = ((float )SystemFlags.osc_volume[i] / 10.0F);
+
 		SetADSR_oscParams(osc_number+i,velocity);
+
 		switch(SystemFlags.osc_waves[i])
 		{
-		case	TRIANGLE : Oscillator[osc_number].waveform = TRIANGLE; break;
-		case	SQUARE : Oscillator[osc_number].waveform = SQUARE; break;
-		case	SINE : Oscillator[osc_number].waveform = SINE; break;
-		default : Oscillator[osc_number].waveform = SINE; break;
+		case	TRIANGLE 	: Oscillator[osc_number+i].waveform = TRIANGLE; break;
+		case	SQUARE 		: Oscillator[osc_number+i].waveform = SQUARE; break;
+		case	NOISE 		: Oscillator[osc_number+i].waveform = NOISE; break;
+		default 			: Oscillator[osc_number+i].waveform = SINE; break;
 		}
 	}
 }

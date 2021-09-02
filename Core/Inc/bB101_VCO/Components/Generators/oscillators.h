@@ -9,6 +9,7 @@
 #define INC_BB100_OSCILLATORS_H_
 
 #define	WAVETABLE_SIZE					256
+
 #define	INT_PRECISION					256
 #define	INT_PRECISION_SHIFT				(INT_PRECISION >> 5)
 #define	MAX_DETUNE_PERCENT_F			2.0f
@@ -16,9 +17,6 @@
 #define	TRIANGLE						1
 #define	SQUARE							2
 #define	NOISE							3
-#define	NOISEMODSINE					4
-#define	NOISEMODTRIANGLE				5
-#define	NOISEMODSQUARE					6
 
 #define	OSC_OFF							0
 #define	OSC_GO_OFF						1

@@ -77,7 +77,7 @@ void bB101_Vco_ControlLoop(void)
 			SystemFlags.delay_feedback_multiplier = 1.0-SystemFlags.delay_sample_multiplier;
 		}
 
-		if (( SystemFlags.last_tuner_val != ((TUNER_CONTROL >> 4 ) << 4) ) || (( SystemFlags.oscillator_flags & OSC_FM_PENDING) == OSC_FM_PENDING))
+		if (( SystemFlags.last_tuner_val != (TUNER_CONTROL & 0xffc0 )) || (( SystemFlags.oscillator_flags & OSC_FM_PENDING) == OSC_FM_PENDING))
 		{
 			if (( SystemFlags.control_flags & CONTROL_FM) == CONTROL_FM)
 			{
@@ -86,11 +86,11 @@ void bB101_Vco_ControlLoop(void)
 			}
 			else
 			{
-				SystemFlags.tuner_delta_multiplier = ((float )TUNER_CONTROL - 2048.0F )/ 2048.0F;
+				SystemFlags.tuner_delta_multiplier = ((float )TUNER_CONTROL - 2048.0F )/ 204.8F;
 				SystemFlags.oscillator_tuner_constant = (SystemFlags.cv_voltage + SystemFlags.cv_voltage_div_10 * (float )TUNER_CONTROL / 2048.0F ) ;
 			}
 
-			SystemFlags.last_tuner_val = (TUNER_CONTROL >> 4 ) << 4;
+			SystemFlags.last_tuner_val = TUNER_CONTROL & 0xffc0;
 			SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
 			SystemFlags.oscillator_flags &= ~OSC_FM_PENDING;
 
@@ -112,7 +112,7 @@ void bB101_Vco_ControlLoop(void)
 				if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
 				{
 					Phaser_Rate_set(VCF_CUTOFF_POTCONTROL >> 5);
-					Phaser_Feedback_set(VCF_RESONANCE_POTCONTROL >> 5);
+					Phaser_Feedback_set((float )VCF_RESONANCE_POTCONTROL / 43.0F);
 				}
 				else
 				{

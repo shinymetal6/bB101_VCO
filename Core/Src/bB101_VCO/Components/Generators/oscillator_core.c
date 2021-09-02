@@ -156,7 +156,6 @@ uint16_t	adsr_value;
 				adsr_value = f_adsr(osc_number,angle );
 				switch(Oscillator[osc_number].waveform)
 				{
-				case	SINE		:	osc_buffer_gen[i] = (sinetab[angle] * adsr_value ); break;
 				case	TRIANGLE	:	osc_buffer_gen[i] = (tritab[osc_number & 0x03][angle] * adsr_value ); break;
 				case	SQUARE		:
 					if ( angle >  (uint8_t )((float )Oscillator[osc_number & 0x03].duty) )
@@ -165,38 +164,29 @@ uint16_t	adsr_value;
 						osc_buffer_gen[i] = 0;
 					break;
 				case NOISE			:	osc_buffer_gen[i] = noise_buffer_gen[i] << 16 | noise_buffer_gen[(i+1) & (HALF_NUMBER_OF_AUDIO_SAMPLES-1)];break;
-				case NOISEMODSINE	:	osc_buffer_gen[i] = ((sinetab[angle] >> 1) + (noise_buffer_gen[i]>>Oscillator[osc_number].noise_weight )) * adsr_value  ; break;
-				case NOISEMODTRIANGLE	:	osc_buffer_gen[i] = ((tritab[osc_number & 0x03][angle]) + (noise_buffer_gen[i]>>Oscillator[osc_number].noise_weight )) * adsr_value; break;
-				case NOISEMODSQUARE		:
-					if ( angle >  (uint8_t )((float )Oscillator[osc_number & 0x03].duty) )
-						osc_buffer_gen[i] = ((DAC_RESOLUTION-1) * + (noise_buffer_gen[i]>>Oscillator[osc_number].noise_weight )) * adsr_value;
-					else
-						osc_buffer_gen[i] = 0;
-					break;
 				default				:	osc_buffer_gen[i] = (sinetab[angle] * adsr_value ); break;
 				}
 
 				osc_buffer[i] += ((float )osc_buffer_gen[i] * Oscillator[osc_number].volume);
 
 				Oscillator[osc_number].current_phase += Oscillator[osc_number].delta_phase;
-				if ((( SystemFlags.oscillator_flags & OSC_TUNE_PENDING ) == OSC_TUNE_PENDING) && ( Oscillator[osc_number].midi_note != INVALID_MIDI_NOTE))
-				{
-					float	delta_phase;
-					float	freq;
-					float 	deltaPre;
-					float 	delta=0;
 
-					deltaPre = midi_freq[Oscillator[osc_number].midi_note+1] - midi_freq[Oscillator[osc_number].midi_note];
-					delta = SystemFlags.tuner_delta_multiplier * deltaPre;
-					freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune  + delta;
-					delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
-					Oscillator[osc_number].current_phase += (uint16_t )(delta_phase * (float )INT_PRECISION);
+				if ( Oscillator[osc_number].midi_note != INVALID_MIDI_NOTE)
+				{
+					if (( SystemFlags.oscillator_flags & OSC_TUNE_PENDING ) == OSC_TUNE_PENDING)
+					{
+						float	delta_phase;
+						float	freq;
+
+						freq = midi_freq[Oscillator[osc_number].midi_note] + Oscillator[osc_number].detune + SystemFlags.tuner_delta_multiplier;
+						delta_phase = (float )WAVETABLE_SIZE / ((float )SystemParameters.audio_sampling_frequency / freq);
+						Oscillator[osc_number].delta_phase = (uint16_t )(delta_phase * (float )INT_PRECISION);
+					}
 				}
 			}
 		}
 	}
-
-	SystemFlags.control_flags &= ~OSC_TUNE_PENDING;
+	SystemFlags.oscillator_flags &= ~OSC_TUNE_PENDING;
 	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 		oscout_buffer[i] = HALF_DAC_RESOLUTION + ((osc_buffer[i] >> 19) & (DAC_RESOLUTION-1));
 }

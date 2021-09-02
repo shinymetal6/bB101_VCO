@@ -232,14 +232,16 @@ static void change_duty(uint8_t channel, uint8_t value) // max_val is 100
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;
 }
 
-#define	DETUNE_SCALING	(100.0F / 127.0F)
+#define	DETUNE_SCALING	(100.0F / 128.0F)
 static void change_detune(uint8_t channel, uint8_t value)
 {
 float	 detune;
 	detune = midi_freq[Oscillator[channel].midi_note]*0.2F;
 	Oscillator[channel].detune = detune * (value/512.0F);
-	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
+	SystemFlags.fosc_detune[channel] = detune * (value/512.0F);
+
 	SystemFlags.osc_detune[channel] = (uint8_t )((float )value * DETUNE_SCALING);
+	SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
 	SystemFlags.tonormaldisplay_counter = TIME_FOR_INFO;
 	SystemFlags.rollback_flags |= ROLL_DETUNE;
 	SystemFlags.control_flags |= CONTROL_ROLLBACK2ADSR;

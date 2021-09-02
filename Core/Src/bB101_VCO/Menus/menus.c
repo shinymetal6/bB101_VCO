@@ -734,6 +734,7 @@ uint32_t	calc_duty;
 uint8_t ChangeOscillatorDetune(uint8_t oscillator_offset )
 {
 uint8_t	i;
+
 	for(i=0;i<NUMOSCILLATORS;i+=VOICES)
 	{
 		if ( SystemFlags.osc_detune[oscillator_offset] < 50 )
@@ -744,7 +745,7 @@ uint8_t	i;
 		{
 			Oscillator[i+oscillator_offset].detune = ((float )SystemFlags.osc_detune[oscillator_offset] - 50.0F) / 10.0F;
 		}
-		SetDetune(i+oscillator_offset);
+		SystemFlags.oscillator_flags |= OSC_TUNE_PENDING;
 	}
 	return 0;
 }

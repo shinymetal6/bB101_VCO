@@ -26,7 +26,7 @@ extern	RNG_HandleTypeDef hrng;
 
 /* System */
 #define	SAMPLE_FREQUENCY				44100
-#define	SAMPLE_PERIOD					(1.0F / 44100)
+#define	SAMPLE_PERIOD					(1.0F / SAMPLE_FREQUENCY)
 #define _2PI                    		6.283185307F
 #define _PI                    			3.14159265F
 #define	SIGNAL_LEN						256
@@ -83,6 +83,7 @@ typedef struct _SystemFlagsDef
 	uint8_t		osc_waves[4];
 	uint8_t 	osc_duty[4];
 	uint8_t 	osc_detune[4];
+	uint8_t 	fosc_detune[4];
 	uint8_t 	osc_volume[4];	// range 0..10
 	uint8_t 	osc_duty_percent[4];
 	uint8_t 	Atime,Dtime,Sval,Rtime;

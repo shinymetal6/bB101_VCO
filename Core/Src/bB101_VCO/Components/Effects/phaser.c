@@ -40,12 +40,12 @@ void Phaser_Rate_set(uint8_t val)
 
 void Phaser_Feedback_set(uint8_t val)
 {
-	fb = 0.999f * val / MIDI_MAX;
+	fb = 0.999f * (float )val / MIDI_MAX;
 }
 
 void Phaser_Wet_set(uint8_t val)
 {
-	wet = val / MIDI_MAX;
+	wet = (float )val / MIDI_MAX;
 }
 
 void PhaserRate(float rate)
@@ -101,7 +101,7 @@ float Phaser_compute(float xin)
 	yout = (yout > 1.0f) ? 1.0f : yout; //clip too loud samples
 	yout = (yout < -1.0f) ? -1.0f : yout;
 	*/
-	return yout*0.9f;
+	return yout*0.8f;
 }
 
 void PhaserInit(void)
