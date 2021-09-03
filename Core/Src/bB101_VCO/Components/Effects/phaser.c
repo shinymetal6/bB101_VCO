@@ -31,7 +31,6 @@ static float	a1;
 static float	zm1;
 
 
-
 void Phaser_Rate_set(uint8_t val)
 {
 	swrate = (MAX_RATE - MIN_RATE) / MIDI_MAX * val + MIN_RATE;
@@ -69,11 +68,11 @@ static float allpass(float yin, int ind)
 }
 
 
-float Phaser_compute(float xin)
+float process_Phaser(float xin)
 {
-	float yout;
-	int i;
-	float d;
+float yout;
+int i;
+float d;
 
 	//calculate and update phaser sweep lfo...
 
@@ -117,12 +116,4 @@ void PhaserInit(void)
 	lfoInc = _2PI * swrate / SAMPLE_FREQUENCY;
 }
 
-/*
-void Phaser( uint16_t *buffer_out,uint16_t *buffer_in)
-{
-uint32_t	i;
-	for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
-		buffer_out[i] = (uint16_t )Phaser_compute((float )buffer_in[i] );
-}
-*/
 

@@ -132,7 +132,7 @@ extern	uint8_t ChangeOscillatorVolume(uint8_t oscillator_offset );
 extern	void DisplayVolume(void);
 extern	void DisplayDuty(void);
 extern	void DisplayDetune(void);
-extern	void Draw_Filter_Params(void);
+extern	void Draw_AFX_Params(void);
 extern	void Draw_Effects(void);
 extern	void View_Sequence(void);
 extern	void View_Delay(void);

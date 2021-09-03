@@ -19,7 +19,7 @@
 
 extern	void PhaserInit(void);
 extern	void Phaser( uint16_t *buffer_out,uint16_t *buffer_in);
-extern	float Phaser_compute(float xin);
+extern	float process_Phaser(float xin);
 extern	void Phaser_Rate_set(uint8_t val);
 extern	void Phaser_Feedback_set(uint8_t val);
 extern	void Phaser_Wet_set(uint8_t val);

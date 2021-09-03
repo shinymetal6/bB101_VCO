@@ -58,8 +58,7 @@ typedef struct _OscillatorsTypeDef
 	float 					detune;
 	uint8_t 				duty;
 	float 					volume;
-	uint8_t 				noise_weight;
-}OscillatorsTypeDef;
+} OscillatorsTypeDef;
 
 
 extern	OscillatorsTypeDef	Oscillator[NUMOSCILLATORS];

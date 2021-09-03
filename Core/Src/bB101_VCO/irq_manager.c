@@ -33,13 +33,13 @@ uint16_t	start,end;
 		RunOscillator4();
 	if (( SystemFlags.control_flags & CONTROL_OSC_VCF_DLY ) == CONTROL_OSC_VCF_DLY)
 	{
-		Moog_VCF(&pipe0[0],&oscout_buffer[0]);
+		AFX(&pipe0[0],&oscout_buffer[0]);
 		DelayLine(&pipe1[0],&pipe0[0]);
 	}
 	else
 	{
 		DelayLine(&pipe0[0],&oscout_buffer[0]);
-		Moog_VCF(&pipe1[0],&pipe0[0]);
+		AFX(&pipe1[0],&pipe0[0]);
 	}
 
 	get_limits(&start,&end);

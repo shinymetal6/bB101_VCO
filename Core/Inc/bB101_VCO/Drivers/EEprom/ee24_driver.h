@@ -42,8 +42,8 @@ typedef struct _ProgramTypeDef
 	uint8_t 	program_flags1;				//	1				2
 	uint8_t 	oscillator_flags;			//	2				3
 	uint8_t 	control_flags;				//	3				4
-	uint8_t 	vcf_flags;					//	4				5
-	uint8_t 	afx_flags;					//	5				6
+	uint8_t 	afx_flags;					//	4				5
+	uint8_t 	afxtype_flags;				//	5				6
 	uint8_t 	delay_flags;				//	6 				7
 	uint8_t 	delay_value;				//	7 				8
 	uint8_t		osc_wavesh;					//	8 				9

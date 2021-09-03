@@ -87,8 +87,8 @@ typedef struct _SystemFlagsDef
 	uint8_t 	osc_volume[4];	// range 0..10
 	uint8_t 	osc_duty_percent[4];
 	uint8_t 	Atime,Dtime,Sval,Rtime;
-	uint8_t 	vcf_flags;
 	uint8_t 	afx_flags;
+	uint8_t 	afxtype_flags;
 	uint8_t 	delay_flags;
 	uint16_t 	delay_value_from_prog;
 	uint16_t 	delay_value_from_midi;
@@ -170,21 +170,21 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	AUDIO_VCO_HALF_FLAG			0x01
 #define	AUDIO_READY_FLAG			0x80
 
-/* vcf_flags values */
-#define	VCF_CONTROL_MASK			0x07
-#define	VCF_CONTROL_POT				0x01
-#define	VCF_CONTROL_MIDI			0x02
-#define	VCF_CONTROL_CV				0x04
-#define	VCF_TYPE_LP					0x08
-#define	VCF_TYPE_BP					0x10
-#define	VCF_TYPE_HP					0x20
-#define	VCF_ENABLED					0x40
-#define	VCF_TYPE_MASK				(VCF_TYPE_BP | VCF_TYPE_LP | VCF_TYPE_HP)
+/* afx_flags values */
+#define	AFX_CONTROL_MASK			0x07
+#define	AFX_CONTROL_POT				0x01
+#define	AFX_CONTROL_MIDI			0x02
+#define	AFX_CONTROL_CV				0x04
+#define	AFX_CONTROL_LP				0x08
+#define	AFX_CONTROL_BP				0x10
+#define	AFX_CONTROL_HP				0x20
+#define	AFX_ENABLED					0x40
+#define	AFX_TYPE_MASK				(AFX_CONTROL_LP | AFX_CONTROL_BP | AFX_CONTROL_HP)
 
-/* afx_flags */
-#define	AFX_MOOG1				0x01
-#define	AFX_MOOG2				0x02
-#define	AFX_PHASER				0x04
+/* afxtype_flags */
+#define	AFXTYPE_MOOG1				0x01
+#define	AFXTYPE_MOOG2				0x02
+#define	AFXTYPE_PHASER				0x04
 
 /* delay_flags values */
 #define	DLY_MIXER_FLANGER_POT		0x00
@@ -228,11 +228,11 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	VCO_FM						SystemFlags.control_adc2_buf[3]
 
 /* RVAR2 */
-#define	VCF_CUTOFF_POTCONTROL		SystemFlags.control_adc2_buf[0]
+#define	AFX_CUTOFF_POTCONTROL		SystemFlags.control_adc2_buf[0]
 /* RVAR4 */
 #define	TUNER_CONTROL				SystemFlags.control_adc2_buf[1]
 /* RVAR5 */
-#define	VCF_RESONANCE_POTCONTROL	SystemFlags.control_adc2_buf[2]
+#define	AFX_RESONANCE_POTCONTROL	SystemFlags.control_adc2_buf[2]
 /* RVAR8 */
 #define	DELAY_FEEDBACK_POTCONTROL	SystemFlags.control_adc1_buf[0]
 
@@ -244,7 +244,7 @@ extern uint16_t	signal_out[SIGNAL_LEN];
 #include <Generators/oscillators.h>
 #include <Generators/noise.h>
 #include <IntADC/control_adc.h>
-#include <Effects/moog_vcf.h>
+#include <Effects/afx.h>
 #include <Effects/delay_line.h>
 #include <Effects/vca.h>
 #include <Effects/phaser.h>

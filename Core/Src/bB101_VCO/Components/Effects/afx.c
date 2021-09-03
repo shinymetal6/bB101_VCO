@@ -25,14 +25,14 @@ void Set_Filter2_Coefficients(void)
 	VCFParameters.filter2_constant01 = VCFParameters.filterCutoff*VCFParameters.filterCutoff*VCFParameters.filterCutoff*VCFParameters.filterCutoff*0.35013F;;
 }
 
-void Clear_VCF_data(void)
+void Clear_AFX_data(void)
 {
 	VCFParameters.b0=VCFParameters.b1=VCFParameters.b2=VCFParameters.b3=VCFParameters.b4=0;
 	VCFParameters.in1=VCFParameters.in2=VCFParameters.in3=VCFParameters.in4=0;
 	VCFParameters.out1=VCFParameters.out2=VCFParameters.out3=VCFParameters.out4=0;
 }
 
-float process_filter1(float in)
+float process_moog1_filter(float in)
 {
 float t1, t2;              //temporary buffers
 	in -= VCFParameters.q * VCFParameters.b4;                          //feedback
@@ -45,11 +45,11 @@ float t1, t2;              //temporary buffers
 	VCFParameters.b4 = (VCFParameters.b3 + t1) * VCFParameters.p - VCFParameters.b4 * VCFParameters.f;
 	VCFParameters.b4 = VCFParameters.b4 - VCFParameters.b4 * VCFParameters.b4 * VCFParameters.b4 * 0.166667F;    //clipping
 	VCFParameters.b0 = in;
-	if (( SystemFlags.vcf_flags & VCF_TYPE_BP ) == VCF_TYPE_BP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_BP ) == AFX_CONTROL_BP)
 		return 3.0f * (VCFParameters.b3 - VCFParameters.b4);
-	if (( SystemFlags.vcf_flags & VCF_TYPE_LP ) == VCF_TYPE_LP) // in -= q*(b4 - in)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_LP ) == AFX_CONTROL_LP) // in -= q*(b4 - in)
 		return VCFParameters.b4;
-	if (( SystemFlags.vcf_flags & VCF_TYPE_HP ) == VCF_TYPE_HP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_HP ) == AFX_CONTROL_HP)
 		return (in - 3.0f * (VCFParameters.b3 - VCFParameters.b4))-VCFParameters.b4;
 	return 0;
 	// Lowpass  output:  b4
@@ -57,7 +57,7 @@ float t1, t2;              //temporary buffers
 	// Bandpass output:  3.0f * (b3 - b4);
 }
 
-float process_filter2(float input)
+float process_moog2_filter(float input)
 {
 	input -= VCFParameters.out4 * VCFParameters.filterResonance;
 	input *= VCFParameters.filter2_constant01; //0.35013 * (f*f)*(f*f);
@@ -69,27 +69,27 @@ float process_filter2(float input)
 	VCFParameters.in3  = VCFParameters.out2;
 	VCFParameters.out4 = VCFParameters.out3 + 0.3F * VCFParameters.in4 + (1 - VCFParameters.filterCutoff) * VCFParameters.out4; // Pole 4
 	VCFParameters.in4 = VCFParameters.out3;
-	if (( SystemFlags.vcf_flags & VCF_TYPE_BP ) == VCF_TYPE_BP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_BP ) == AFX_CONTROL_BP)
 		return 3.0f * (VCFParameters.out3 - VCFParameters.out4);
-	if (( SystemFlags.vcf_flags & VCF_TYPE_LP ) == VCF_TYPE_LP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_LP ) == AFX_CONTROL_LP)
 		return VCFParameters.out4;
-	if (( SystemFlags.vcf_flags & VCF_TYPE_HP ) == VCF_TYPE_HP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_HP ) == AFX_CONTROL_HP)
 		return input - VCFParameters.out4;
 	return 0;
 }
 
-void Moog_VCF( uint16_t *buffer_out,uint16_t *buffer_in )
+void AFX( uint16_t *buffer_out,uint16_t *buffer_in )
 {
 uint16_t	i;
 
-	if (( SystemFlags.vcf_flags & VCF_ENABLED ) == 0)
+	if (( SystemFlags.afx_flags & AFX_ENABLED ) == 0)
 	{
 		for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 			*buffer_out++ = *buffer_in++;
 	}
 	else
 	{
-		if ((( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1) || (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2))
+		if ((( SystemFlags.afxtype_flags & AFXTYPE_MOOG1) == AFXTYPE_MOOG1) || (( SystemFlags.afxtype_flags & AFXTYPE_MOOG2) == AFXTYPE_MOOG2))
 		{
 			if ( isnan(VCFParameters.b0) )
 				VCFParameters.b0=VCFParameters.b1=VCFParameters.b2=VCFParameters.b3=VCFParameters.b4=0;
@@ -97,12 +97,12 @@ uint16_t	i;
 
 		for ( i=0;i<HALF_NUMBER_OF_AUDIO_SAMPLES;i++)
 		{
-			if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
-				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_filter1(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
-			else if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
-				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_filter2(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
-			else if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
-				*buffer_out++ = (uint16_t )Phaser_compute((float )buffer_in[i] );
+			if (( SystemFlags.afxtype_flags & AFXTYPE_MOOG1) == AFXTYPE_MOOG1)
+				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_moog1_filter(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
+			else if (( SystemFlags.afxtype_flags & AFXTYPE_MOOG2) == AFXTYPE_MOOG2)
+				*buffer_out++ = FLOAT_2_NORMALIZED_INT(process_moog2_filter(INT_2_NORMALIZED_FLOAT(*buffer_in++)));
+			else if (( SystemFlags.afxtype_flags & AFXTYPE_PHASER) == AFXTYPE_PHASER)
+				*buffer_out++ = (uint16_t )process_Phaser((float )buffer_in[i] );
 			else
 				*buffer_out++ = *buffer_in++;
 		}

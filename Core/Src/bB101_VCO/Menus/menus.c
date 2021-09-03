@@ -721,7 +721,6 @@ uint32_t	calc_duty;
 	if ( duty > 99 )
 		duty = 99;
 
-	SystemFlags.osc_duty_percent[oscillator_offset & 0x03] = duty;
 	calc_duty = (uint32_t )((float )duty*DUTY_SCALE);
 	for(i=0;i<NUMOSCILLATORS;i+=VOICES)
 	{
@@ -755,7 +754,7 @@ void View_Sequence(void)
 	ST7735_WriteString(LINE_X_SEQUENCE,LINE_Y_SEQUENCE,"O", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 	if (( SystemFlags.control_flags & CONTROL_OSC_VCF_DLY) == CONTROL_OSC_VCF_DLY)
 	{
-		if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
+		if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED)
 			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 		else
 			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_GREY, ST7735_BLACK);
@@ -771,7 +770,7 @@ void View_Sequence(void)
 			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"D", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 		else
 			ST7735_WriteString(LINE_X_SEQUENCE+7,LINE_Y_SEQUENCE,"D", Font_7x10, ST7735_GREY, ST7735_BLACK);
-		if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
+		if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED)
 			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_DARKGREEN, ST7735_BLACK);
 		else
 			ST7735_WriteString(LINE_X_SEQUENCE+14,LINE_Y_SEQUENCE,"X", Font_7x10, ST7735_GREY, ST7735_BLACK);
@@ -852,37 +851,37 @@ uint16_t	color;
 }
 
 
-void Draw_Filter_Params(void)
+void Draw_AFX_Params(void)
 {
 uint16_t	color = ST7735_GREY;
-	if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
+	if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED)
 		color = ST7735_DARKGREEN;
 
-	if (( SystemFlags.vcf_flags & VCF_TYPE_BP ) == VCF_TYPE_BP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_BP ) == AFX_CONTROL_BP)
 		ST7735_WriteString(LINE_X_FILTER,LINE_Y_FILTER,"BP", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.vcf_flags & VCF_TYPE_HP ) == VCF_TYPE_HP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_HP ) == AFX_CONTROL_HP)
 		ST7735_WriteString(LINE_X_FILTER,LINE_Y_FILTER,"HP", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.vcf_flags & VCF_TYPE_LP ) == VCF_TYPE_LP)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_LP ) == AFX_CONTROL_LP)
 		ST7735_WriteString(LINE_X_FILTER,LINE_Y_FILTER,"LP", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.vcf_flags & VCF_CONTROL_MIDI ) == VCF_CONTROL_MIDI)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_MIDI ) == AFX_CONTROL_MIDI)
 		ST7735_WriteString(LINE_X_CONTROL,LINE_Y_CONTROL,"MIDI", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.vcf_flags & VCF_CONTROL_CV ) == VCF_CONTROL_CV)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_CV ) == AFX_CONTROL_CV)
 		ST7735_WriteString(LINE_X_CONTROL,LINE_Y_CONTROL,"CV  ", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.vcf_flags & VCF_CONTROL_POT ) == VCF_CONTROL_POT)
+	if (( SystemFlags.afx_flags & AFX_CONTROL_POT ) == AFX_CONTROL_POT)
 		ST7735_WriteString(LINE_X_CONTROL,LINE_Y_CONTROL,"POT ", Font_7x10, color, ST7735_BLACK);
 }
 
 void Draw_Effects(void)
 {
 uint16_t	color = ST7735_GREY;
-	if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
+	if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED)
 		color = ST7735_DARKGREEN;
 
-	if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
+	if (( SystemFlags.afxtype_flags & AFXTYPE_MOOG1) == AFXTYPE_MOOG1)
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Moog1", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
+	if (( SystemFlags.afxtype_flags & AFXTYPE_MOOG2) == AFXTYPE_MOOG2)
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Moog2", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
+	if (( SystemFlags.afxtype_flags & AFXTYPE_PHASER) == AFXTYPE_PHASER)
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Phsr ", Font_7x10, color, ST7735_BLACK);
 }
 
@@ -1009,10 +1008,10 @@ ScreenTypeDef	*current_screen;
 			}
 			else
 			{
-				if ( SystemFlags.osc_duty[SystemFlags.menu_line_counter-1] < 95 )
-					SystemFlags.osc_duty[SystemFlags.menu_line_counter-1] += 5;
+				if ( SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter-1] < 95 )
+					SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter-1] += 5;
 				else
-					SystemFlags.osc_duty[SystemFlags.menu_line_counter-1] = 5;
+					SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter-1] = 5;
 
 				ChangeOscillatorDuty(SystemFlags.menu_line_counter-1 , SystemFlags.osc_duty_percent[SystemFlags.menu_line_counter]);
 				DisplayDuty();
@@ -1136,82 +1135,82 @@ ScreenTypeDef	*current_screen;
 		{
 			if ( SystemFlags.menu_line_counter == 1) // band
 			{
-				if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
+				if (( SystemFlags.afxtype_flags & AFXTYPE_MOOG1) == AFXTYPE_MOOG1)
 				{
-					SystemFlags.afx_flags &= ~AFX_MOOG1;
-					SystemFlags.afx_flags |= AFX_MOOG2;
+					SystemFlags.afxtype_flags &= ~AFXTYPE_MOOG1;
+					SystemFlags.afxtype_flags |= AFXTYPE_MOOG2;
 				}
-				else if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
+				else if (( SystemFlags.afxtype_flags & AFXTYPE_MOOG2) == AFXTYPE_MOOG2)
 				{
-					SystemFlags.afx_flags &= ~AFX_MOOG2;
-					SystemFlags.afx_flags |= AFX_PHASER;
+					SystemFlags.afxtype_flags &= ~AFXTYPE_MOOG2;
+					SystemFlags.afxtype_flags |= AFXTYPE_PHASER;
 				}
-				else if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
+				else if (( SystemFlags.afxtype_flags & AFXTYPE_PHASER) == AFXTYPE_PHASER)
 				{
-					SystemFlags.afx_flags &= ~AFX_PHASER;
-					SystemFlags.afx_flags |= AFX_MOOG1;
+					SystemFlags.afxtype_flags &= ~AFXTYPE_PHASER;
+					SystemFlags.afxtype_flags |= AFXTYPE_MOOG1;
 				}
 				Draw_Effects();
-				Clear_VCF_data();
+				Clear_AFX_data();
 			}
 
 			if ( SystemFlags.menu_line_counter == 2) // band
 			{
-				switch ( SystemFlags.vcf_flags & VCF_TYPE_MASK)
+				switch ( SystemFlags.afx_flags & AFX_TYPE_MASK)
 				{
-				case	VCF_TYPE_LP :
-					SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
-					SystemFlags.vcf_flags |= VCF_TYPE_BP;
+				case	AFX_CONTROL_LP :
+					SystemFlags.afx_flags &= ~AFX_TYPE_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_BP;
 					break;
-				case	VCF_TYPE_BP :
-					SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
-					SystemFlags.vcf_flags |= VCF_TYPE_HP;
+				case	AFX_CONTROL_BP :
+					SystemFlags.afx_flags &= ~AFX_TYPE_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_HP;
 					break;
-				case	VCF_TYPE_HP :
-					SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
-					SystemFlags.vcf_flags |= VCF_TYPE_LP;
+				case	AFX_CONTROL_HP :
+					SystemFlags.afx_flags &= ~AFX_TYPE_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_LP;
 					break;
 				default :
-					SystemFlags.vcf_flags &= ~VCF_TYPE_MASK;
-					SystemFlags.vcf_flags |= VCF_TYPE_LP;
+					SystemFlags.afx_flags &= ~AFX_TYPE_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_LP;
 					break;
 				}
-				Draw_Filter_Params();
+				Draw_AFX_Params();
 			}
 			if ( SystemFlags.menu_line_counter == 3) // control
 			{
-				switch ( SystemFlags.vcf_flags & VCF_CONTROL_MASK)
+				switch ( SystemFlags.afx_flags & AFX_CONTROL_MASK)
 				{
-				case	VCF_CONTROL_POT :
-					SystemFlags.vcf_flags &= ~VCF_CONTROL_MASK;
-					SystemFlags.vcf_flags |= VCF_CONTROL_MIDI;
+				case	AFX_CONTROL_POT :
+					SystemFlags.afx_flags &= ~AFX_CONTROL_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_MIDI;
 					break;
-				case	VCF_CONTROL_MIDI :
-					SystemFlags.vcf_flags &= ~VCF_CONTROL_MASK;
-					SystemFlags.vcf_flags |= VCF_CONTROL_CV;
+				case	AFX_CONTROL_MIDI :
+					SystemFlags.afx_flags &= ~AFX_CONTROL_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_CV;
 					break;
-				case	VCF_CONTROL_CV :
-					SystemFlags.vcf_flags &= ~VCF_CONTROL_MASK;
-					SystemFlags.vcf_flags |= VCF_CONTROL_POT;
+				case	AFX_CONTROL_CV :
+					SystemFlags.afx_flags &= ~AFX_CONTROL_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_POT;
 					break;
 				default :
-					SystemFlags.vcf_flags &= ~VCF_CONTROL_MASK;
-					SystemFlags.vcf_flags |= VCF_CONTROL_MIDI;
+					SystemFlags.afx_flags &= ~AFX_CONTROL_MASK;
+					SystemFlags.afx_flags |= AFX_CONTROL_MIDI;
 					break;
 				}
-				Draw_Filter_Params();
+				Draw_AFX_Params();
 			}
 			if ( SystemFlags.menu_line_counter == 4) // enable
 			{
-				if (( SystemFlags.vcf_flags & VCF_ENABLED) == VCF_ENABLED)
+				if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED)
 				{
-					SystemFlags.vcf_flags &= ~VCF_ENABLED;
+					SystemFlags.afx_flags &= ~AFX_ENABLED;
 				}
 				else
 				{
-					SystemFlags.vcf_flags |= VCF_ENABLED;
+					SystemFlags.afx_flags |= AFX_ENABLED;
 				}
-				Draw_Filter_Params();
+				Draw_AFX_Params();
 				Draw_Effects();
 				View_Sequence();
 			}
@@ -1469,7 +1468,7 @@ uint8_t	i;
 	View_Sequence();
 	View_Delay();
 	View_Delay_Val();
-	Draw_Filter_Params();
+	Draw_AFX_Params();
 	Draw_Effects();
 	view_am();
 	view_fm();
