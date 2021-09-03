@@ -131,14 +131,16 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 #define	OSC_DETUNE_PENDING			0x02
 #define	OSC_DUTY_PENDING			0x04
 #define	OSC_WAVE_PENDING			0x08
-#define	OSC_FM_PENDING				0x20
-#define	OSC_TUNE_PENDING			0x40
+#define	OSC_FM_PENDING				0x10
+#define	OSC_TUNE_PENDING			0x20
+//NOT USED							0x40
 #define	OSC_SRCFLAG					0x80	/* 0 is from Cv , 1 is from MIDI */
 
 /* rollback_flags */
 #define	ROLL_VOLUME					0x01
 #define	ROLL_DUTY					0x02
 #define	ROLL_DETUNE					0x04
+#define	ROLLS_MASK					(ROLL_VOLUME | ROLL_DUTY | ROLL_DETUNE)
 
 /* buttons_flags values */
 #define	BUTTON_TACT0	1
@@ -182,9 +184,7 @@ ADSR_TIME_UNIT is 1 / 44100 *128 = 2,902494331 mSec. , rounded to 3 mSec.
 /* afx_flags */
 #define	AFX_MOOG1				0x01
 #define	AFX_MOOG2				0x02
-#define	AFX_RESF1				0x04
-#define	AFX_RESF2				0x08
-#define	AFX_PHASER				0x10
+#define	AFX_PHASER				0x04
 
 /* delay_flags values */
 #define	DLY_MIXER_FLANGER_POT		0x00
@@ -248,7 +248,6 @@ extern uint16_t	signal_out[SIGNAL_LEN];
 #include <Effects/delay_line.h>
 #include <Effects/vca.h>
 #include <Effects/phaser.h>
-#include <Effects/resonant_filter.h>
 #include <Effects/effects_sinetable.h>
 #include <Generators/echo.h>
 #include <USB_Midi/midi_note2freq.h>

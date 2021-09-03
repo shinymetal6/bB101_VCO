@@ -109,23 +109,23 @@ void bB101_Vco_ControlLoop(void)
 		{
 			if (( SystemFlags.vcf_flags & VCF_CONTROL_MASK ) == VCF_CONTROL_POT)
 			{
-				if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
+				switch(SystemFlags.afx_flags)
 				{
+				case	AFX_MOOG1	:
+					VCFParameters.filterCutoff  	= (float )VCF_CUTOFF_POTCONTROL    / 4096.0F;
+					VCFParameters.filterResonance 	= (float )VCF_RESONANCE_POTCONTROL / 4096.0F;
+					Set_Filter1_Coefficients();
+					break;
+				case	AFX_MOOG2	:
+					VCFParameters.filterCutoff  	= (float )VCF_CUTOFF_POTCONTROL    / 4096.0F;
+					VCFParameters.filterResonance 	= (float )VCF_RESONANCE_POTCONTROL / 4096.0F;
+					Set_Filter2_Coefficients();
+					break;
+				case	AFX_PHASER	:
 					Phaser_Rate_set(VCF_CUTOFF_POTCONTROL >> 5);
 					Phaser_Feedback_set((float )VCF_RESONANCE_POTCONTROL / 43.0F);
-				}
-				else
-				{
-					VCFParameters.filterCutoff  	= (float )VCF_CUTOFF_POTCONTROL    / 4096.0F;
-					VCFParameters.filterResonance = (float )VCF_RESONANCE_POTCONTROL / 4096.0F;
-					if (( SystemFlags.afx_flags & AFX_MOOG1) == AFX_MOOG1)
-					{
-						Set_Filter1_Coefficients();
-					}
-					if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
-					{
-						Set_Filter2_Coefficients();
-					}
+					break;
+				default	:	break;
 				}
 			}
 		}

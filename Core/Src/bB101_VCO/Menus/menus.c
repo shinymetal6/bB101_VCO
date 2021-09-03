@@ -884,11 +884,8 @@ uint16_t	color = ST7735_GREY;
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Moog2", Font_7x10, color, ST7735_BLACK);
 	if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)
 		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"Phsr ", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.afx_flags & AFX_RESF1) == AFX_RESF1)
-		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"ResF1", Font_7x10, color, ST7735_BLACK);
-	if (( SystemFlags.afx_flags & AFX_RESF2) == AFX_RESF2)
-		ST7735_WriteString(LINE_X_STATUS,LINE_Y_FILTER,"ResF2", Font_7x10, color, ST7735_BLACK);
 }
+
 void DoMenus(void)
 {
 uint16_t	old_line_number;
@@ -1147,16 +1144,6 @@ ScreenTypeDef	*current_screen;
 				else if (( SystemFlags.afx_flags & AFX_MOOG2) == AFX_MOOG2)
 				{
 					SystemFlags.afx_flags &= ~AFX_MOOG2;
-					SystemFlags.afx_flags |= AFX_RESF1;
-				}
-				else if (( SystemFlags.afx_flags & AFX_RESF1) == AFX_RESF1)
-				{
-					SystemFlags.afx_flags &= ~AFX_RESF1;
-					SystemFlags.afx_flags |= AFX_RESF2;
-				}
-				else if (( SystemFlags.afx_flags & AFX_RESF2) == AFX_RESF2)
-				{
-					SystemFlags.afx_flags &= ~AFX_RESF2;
 					SystemFlags.afx_flags |= AFX_PHASER;
 				}
 				else if (( SystemFlags.afx_flags & AFX_PHASER) == AFX_PHASER)

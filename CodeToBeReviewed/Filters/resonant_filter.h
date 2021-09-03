@@ -23,15 +23,22 @@
 #define MIN_FREQ						80.f
 
 //----------------------------------------------------
+
 enum filterTypeEnum
 {
-	FILTER_LP=1,
-	FILTER_HP,
-	FILTER_BP,
+	FILTER_LP=VCF_TYPE_LP,
+	FILTER_HP=VCF_TYPE_HP,
+	FILTER_BP=VCF_TYPE_BP,
 	FILTER_NOTCH,
 	FILTER_PEAK
 };
-
+/*
+#define	FILTER_LP		VCF_TYPE_LP
+#define	FILTER_BP		VCF_TYPE_BP
+#define	FILTER_HP		VCF_TYPE_HP
+#define	FILTER_NOTCH	1
+#define	FILTER_PEAK		2
+*/
 
 //----------------------------------------------------
 typedef struct ResoFilterStruct

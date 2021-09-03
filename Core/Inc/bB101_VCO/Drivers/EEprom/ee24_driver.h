@@ -37,21 +37,21 @@ typedef struct _ProgramTypeDef
 }ProgramTypeDef;
 #else
 typedef struct _ProgramTypeDef
-{									// Flash offset		MIDI Packet offset
-	uint8_t 	program_flags0;		//	0				1
-	uint8_t 	program_flags1;		//	1				2
-	uint8_t 	oscillator_flags;	//	2				3
-	uint8_t 	control_flags;		//	3				4
-	uint8_t 	vcf_flags;			//	4				5
-	uint8_t 	afx_flags;		//	5				6
-	uint8_t 	delay_flags;		//	6 				7
-	uint8_t 	delay_value;		//	7 				8
-	uint8_t		osc_wavesh;			//	8 				9
-	uint8_t		osc_wavesl;			//	9 				10
-	uint8_t 	osc_duty_percent[4];//	10,11,12,13		11:14
-	uint8_t 	osc_detune[4];		//	14,15,16,17		15:18
-	uint8_t 	osc_volume[4];		//  18,19,20,21		19:22
-	uint8_t 	Atime,Dtime,Sval,Rtime;	// 22,23,24,25	23:26
+{											// Flash offset		MIDI Packet offset
+	uint8_t 	program_flags0;				//	0				1
+	uint8_t 	program_flags1;				//	1				2
+	uint8_t 	oscillator_flags;			//	2				3
+	uint8_t 	control_flags;				//	3				4
+	uint8_t 	vcf_flags;					//	4				5
+	uint8_t 	afx_flags;					//	5				6
+	uint8_t 	delay_flags;				//	6 				7
+	uint8_t 	delay_value;				//	7 				8
+	uint8_t		osc_wavesh;					//	8 				9
+	uint8_t		osc_wavesl;					//	9 				10
+	uint8_t 	osc_duty_percent[4];		//	10,11,12,13		11:14
+	uint8_t 	osc_detune[4];				//	14,15,16,17		15:18
+	uint8_t 	osc_volume[4];				//  18,19,20,21		19:22
+	uint8_t 	Atime,Dtime,Sval,Rtime;		//  22,23,24,25		23:26
 }ProgramTypeDef;
 #endif
 

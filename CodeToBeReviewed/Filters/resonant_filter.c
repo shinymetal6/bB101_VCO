@@ -132,10 +132,12 @@ void	Filter1Drive_set(uint8_t val)
 	SVF_setDrive(&SVFilter, val);
 }
 //------------------------------------------------------------------------------------
+/*
 void 	Filter1Type_set(uint8_t val)
 {
 	SVFilter.type = (uint8_t)lrintf(FILTER_TYPES * val / MIDI_MAX);
 }
+*/
 
 //------------------------------------------------------------------------------------
 void 	Filter2Freq_set(uint8_t val)
@@ -154,10 +156,13 @@ void	Filter2Drive_set(uint8_t val)
 	SVF_setDrive(&SVFilter2, val);
 }
 //------------------------------------------------------------------------------------
+/*
 void 	Filter2Type_set(uint8_t val)
 {
 	SVFilter2.type = (uint8_t)lrintf(FILTER_TYPES * val / MIDI_MAX);
 }
+*/
+
 
 //------------------------------------------------------------------------------------
 
@@ -216,11 +221,12 @@ float SVF_calcSample(ResonantFilter* filter, float in)
 	float out;
 
 
-	switch(filter->type)
-
+	//switch(filter->type)
+	switch(SystemFlags.vcf_flags & VCF_TYPE_MASK)
 	{
 
-	case FILTER_LP:
+//	case FILTER_LP:
+	case VCF_TYPE_LP:
 #if USE_SHAPER_NONLINEARITY
 
 		buf[i] = FILTER_GAIN * fastTanh( distortion_calcSampleFloat(&filter->shaper, y1));
@@ -230,7 +236,8 @@ float SVF_calcSample(ResonantFilter* filter, float in)
 #endif
 		break;
 
-	case FILTER_HP:
+	//case FILTER_HP:
+	case VCF_TYPE_HP:
 	{
 		const float ugb = 2*R*y0;
 		const float h = x - ugb - y1;
@@ -244,7 +251,8 @@ float SVF_calcSample(ResonantFilter* filter, float in)
 	}
 	break;
 
-	case FILTER_BP:
+//	case FILTER_BP:
+	case VCF_TYPE_BP:
 #if USE_SHAPER_NONLINEARITY
 
 		buf[i] = FILTER_GAIN * distortion_calcSampleFloat(&filter->shaper, y0);
@@ -254,6 +262,7 @@ float SVF_calcSample(ResonantFilter* filter, float in)
 #endif
 		break;
 
+#ifdef TO_BE_ADDED
 	case FILTER_NOTCH:
 	{
 		const float ugb = 2*R*y0;
@@ -280,7 +289,7 @@ float SVF_calcSample(ResonantFilter* filter, float in)
 #endif
 	}
 	break;
-
+#endif // TO_BE_ADDED
 	default:
 		out = in ;
 		break;

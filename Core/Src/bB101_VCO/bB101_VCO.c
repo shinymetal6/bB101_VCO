@@ -122,7 +122,6 @@ void AFX_Init(void)
 	Phaser_Rate_set(64);
 	Phaser_Feedback_set(64);
 	Phaser_Wet_set(64);
-	SVF_init();
 }
 
 #define	SKIP_ANIMATION	1
