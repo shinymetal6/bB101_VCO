@@ -112,18 +112,35 @@ void bB101_Vco_ControlLoop(void)
 				switch(SystemFlags.afxtype_flags)
 				{
 				case	AFXTYPE_MOOG1	:
-					VCFParameters.filterCutoff  	= (float )AFX_CUTOFF_POTCONTROL    / 4096.0F;
-					VCFParameters.filterResonance 	= (float )AFX_RESONANCE_POTCONTROL / 4096.0F;
+					AFXParameters.filterCutoff  	= (float )AFX_CUTOFF_POTCONTROL    / 4096.0F;
+					AFXParameters.filterResonance 	= (float )AFX_RESONANCE_POTCONTROL / 4096.0F;
 					Set_Filter1_Coefficients();
 					break;
 				case	AFXTYPE_MOOG2	:
-					VCFParameters.filterCutoff  	= (float )AFX_CUTOFF_POTCONTROL    / 4096.0F;
-					VCFParameters.filterResonance 	= (float )AFX_RESONANCE_POTCONTROL / 4096.0F;
+					AFXParameters.filterCutoff  	= (float )AFX_CUTOFF_POTCONTROL    / 4096.0F;
+					AFXParameters.filterResonance 	= (float )AFX_RESONANCE_POTCONTROL / 4096.0F;
 					Set_Filter2_Coefficients();
 					break;
 				case	AFXTYPE_PHASER	:
 					Phaser_Rate_set(AFX_CUTOFF_POTCONTROL >> 5);
 					Phaser_Feedback_set((float )AFX_RESONANCE_POTCONTROL / 47.0F);
+					break;
+				default	:	break;
+				}
+			}
+			if (( SystemFlags.afx_flags & AFX_CONTROL_MASK ) == AFX_CONTROL_MIDI)
+			{
+				switch(SystemFlags.afxtype_flags)
+				{
+				case	AFXTYPE_MOOG1	:
+					Set_Filter1_Coefficients();
+					break;
+				case	AFXTYPE_MOOG2	:
+					Set_Filter2_Coefficients();
+					break;
+				case	AFXTYPE_PHASER	:
+					Phaser_Rate_set(AFXParameters.phaser_rate);
+					Phaser_Feedback_set(AFXParameters.phaser_feedback);
 					break;
 				default	:	break;
 				}

@@ -8,7 +8,7 @@
 #ifndef INC_BB101_VCO_COMPONENTS_EFFECTS_AFX_H_
 #define INC_BB101_VCO_COMPONENTS_EFFECTS_AFX_H_
 
-typedef struct _VCFParametersTypeDef
+typedef struct _AFXParametersTypeDef
 {
 	/* Used for moog1 filter */
 	float 	f, p, q;
@@ -19,10 +19,12 @@ typedef struct _VCFParametersTypeDef
 	float	filterCutoff;
 	float	filterResonance;
 	float	filter2_constant01;
+	uint8_t phaser_rate;
+	uint8_t phaser_feedback;
 
-}VCFParametersTypeDef;
+}AFXParametersTypeDef;
 
-extern	VCFParametersTypeDef	VCFParameters;
+extern	AFXParametersTypeDef	AFXParameters;
 
 extern	void AFX( uint16_t *buffer_in,uint16_t *buffer_out );
 extern	void Set_Filter1_Coefficients(void);

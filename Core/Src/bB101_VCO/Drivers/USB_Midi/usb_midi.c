@@ -250,13 +250,23 @@ float	 detune;
 static void change_afx_resonance( uint8_t value )
 {
 	if (( SystemFlags.afx_flags & AFX_CONTROL_MASK) == AFX_CONTROL_MIDI)
-		VCFParameters.filterResonance  = (float) value * 0.007874016F;
+	{
+		AFXParameters.filterResonance  = (float) value * 0.007874016F;
+		if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED )
+			if (( SystemFlags.afxtype_flags & AFXTYPE_PHASER ) == AFXTYPE_PHASER)
+				AFXParameters.phaser_feedback = value*12.7F;
+	}
 }
 
 static void change_afx_cutoff( uint8_t value )
 {
 	if (( SystemFlags.afx_flags & AFX_CONTROL_MASK) == AFX_CONTROL_MIDI)
-		VCFParameters.filterCutoff  = (float) value * 0.007874016F;
+	{
+		AFXParameters.filterCutoff  = (float) value * 0.007874016F;
+		if (( SystemFlags.afx_flags & AFX_ENABLED) == AFX_ENABLED )
+			if (( SystemFlags.afxtype_flags & AFXTYPE_PHASER ) == AFXTYPE_PHASER)
+				AFXParameters.phaser_rate = value*12.7F;
+	}
 }
 
 static void change_afx_type( uint8_t value )
